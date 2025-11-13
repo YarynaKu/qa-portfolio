@@ -4,10 +4,6 @@
   "description": "Automated UI tests using Playwright",
   "main": "TC_practise.js",
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test-report": "playwright show-report",
-    "format": "prettier --write"
   },
   "keywords": [],
   "author": "",

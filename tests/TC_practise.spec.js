@@ -9,9 +9,9 @@ let pm;
 
 let TEST_USER = 'YaTestUser';
 let TEST_EMAIL = 'testya@gmail.com';
-// let TEST_PASSWORD = 'YaTestPassword!';
-// let INCORR_TEST_PASSWORD = 'YayaTestPassword!';
-// let INCORR_TEST_EMAIL = 'testyaya@gmail.com';
+let TEST_PASSWORD = 'YaTestPassword!';
+let INCORR_TEST_PASSWORD = 'YayaTestPassword!';
+let INCORR_TEST_EMAIL = 'testyaya@gmail.com';
 
 
 
@@ -57,7 +57,7 @@ test.describe('User Tests', () => {
 
     await expect(page.getByText(TEST_USER)).toBeVisible()
 
-    await deleteUser(page)
+//    await deleteUser(page)
 })
 
     test(" 2 Login User with correct email and password", async ({page}) => {
@@ -425,21 +425,139 @@ test.describe('User Tests', () => {
                 expmonth: '01',
                 expyear: '01',
             });
+
+        await expect(page.locator('.alert-success')).toHaveCount(1)
+    })
+   
+        await deleteUser(page)            
+    })
+
+
+    test("16 Place Order: Login Before Checkout", async({page}) => {
+
+        await page.getByRole('link', {name:'Signup / Login'}).click()
+        await expect(page.getByText('Login to your account')).toBeVisible();
+
+        await pm.loginPage.login(`${TEST_EMAIL}`, `${TEST_PASSWORD}`)
+        await expect(page.getByText(TEST_USER)).toBeVisible()
+
+        await test.step('Adding products to the cart', async() => {
+
+            await page.locator('.product-image-wrapper').nth(0).hover()
+            await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+        })
+
+        await page.getByRole('link', {name: 'Cart'}).click()
+
+        await expect(page.locator('li[class="active"]')).toHaveText('Shopping Cart')
+
+        await page.locator('a[class="btn btn-default check_out"]').click()
+
+        await expect(page.getByRole('heading', {name: 'Address Details'})).toBeVisible()
+        await expect(page.getByRole('heading', {name: 'Review Your Order'})).toBeVisible()
+
+        await page.locator('textarea[class="form-control"]').fill('Hello! Please put it in a gift bag')
+
+        await page.getByRole('link', {name: 'Place Order'}).click()
+
+        await test.step('Proceed with a payment', async() => {
+
+            await Payment (page, {
+                nameoncard: 'YaTest',
+                cardnumber: '1234567890',
+                cvc: '123',
+                expmonth: '01',
+                expyear: '01',
+            });
+
+        await expect(page.locator('.alert-success')).toHaveCount(1)
+        })
+   
+        await deleteUser(page)  
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        })
+
+    test("17 Remove Products from Cart", async({page}) => {
+
+        await test.step('Adding products to the cart', async() => {
+
+            await page.locator('.product-image-wrapper').nth(0).hover()
+            await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+
+            await page.getByRole('button', {name: 'Continue Shopping'}).click()
+
+            await page.locator('.product-image-wrapper').nth(1).hover()
+            await page.locator('div.overlay-content').locator('a[data-product-id="2"]').click()
+        })
+
+        await page.getByRole('link', {name: 'Cart'}).click()
+
+        await expect(page.locator('li[class="active"]')).toHaveText('Shopping Cart')
         
+        await page.locator('[data-product-id="1"]').click()
+
+        await expect(page.locator('[data-product-id="1"]')).toBeHidden()
+
+    })
+
+    test("18 View Category Products", async({page}) => {
+
+        await expect(page.getByRole('heading', {name: "Category"})).toBeVisible()
+
+        await page.locator('[href="#Women"]').click()
+        await page.getByRole('link', {name: "DRESS"}).click()
+
+        await expect(page.getByRole('heading', {name: "Women - Dress Products"})).toBeVisible()
+
+        await page.locator('[href="#Men"]').click()
+        await page.getByRole('link', {name: "Tshirts "}).click()
+
+        await expect(page.getByRole('heading', {name: "Men - Tshirts Products"})).toBeVisible()
+
+    })
+
+    test.only("19 View & Cart Brand Products", async({page}) => {
+
+        await page.getByRole('link', {name: 'Products'}).click();
+
+        await expect(page.getByRole('heading', {name: "Brands"})).toBeVisible()
+
+        await page.locator('[href="/brand_products/H&M"]').click()
+
+
+
+    })
+
+
+
+
+
+
+
+
+
+
+
         
-
-
-
-
 
 
 
 
     })
 
-    })
-
-})
 
 
 
