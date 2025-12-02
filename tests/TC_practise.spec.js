@@ -529,7 +529,7 @@ test.describe('User Tests', () => {
 
     })
 
-    test.only("19 View & Cart Brand Products", async({page}) => {
+    test("19 View & Cart Brand Products", async({page}) => {
 
         await page.getByRole('link', {name: 'Products'}).click();
 
@@ -537,7 +537,44 @@ test.describe('User Tests', () => {
 
         await page.locator('[href="/brand_products/H&M"]').click()
 
+        await expect(page.getByRole('heading', {name: "Brand - H&M Products"})).toBeVisible()
 
+        await page.locator('[href="/brand_products/Madame"]').click()
+
+        await expect(page.getByRole('heading', {name: "Brand - Madame Products"})).toBeVisible()
+    })
+
+    test.only("20 Search Products and Verify Cart after Login", async({page}) => {
+
+        await page.getByRole('link', {name: 'Products'}).click();
+
+        await expect(page.getByRole('heading', {name: 'All Products'})).toBeVisible()
+
+        await page.getByRole('textbox', {name: 'Search Product'}).fill('top')
+        await page.locator('id=submit_search').click()
+
+        await expect(page.getByRole('heading', {name: 'Searched Products'})).toBeVisible()
+
+
+        const items = page.locator('p:has-text("Top")')
+        const count = await items.count()
+        console.log('Number of items found: ' + count)
+            for (let i=0; i< count-1; i++) {
+                const product = items.nth(i)
+                await page.product.hover()
+
+                await product
+                    .locator('div.overlay-content')
+                    .locator('a[class="btn btn-default add-to-cart"]')
+                    .click()
+
+//    await page.locator('.product-image-wrapper').nth(0).hover()
+//    await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+
+
+                await page.getByRole('button', {name: 'Continue Shopping'}).click()
+
+            }
 
     })
 
