@@ -553,29 +553,49 @@ test.describe('User Tests', () => {
         await page.getByRole('textbox', {name: 'Search Product'}).fill('top')
         await page.locator('id=submit_search').click()
 
-        await expect(page.getByRole('heading', {name: 'Searched Products'})).toBeVisible()
-
-
-        const items = page.locator('p:has-text("Top")')
+        const items = page.locator('.product-image-wrapper .single-products:has(.productinfo.text-center p:has-text("Top"))')
         const count = await items.count()
-        console.log('Number of items found: ' + count)
-            for (let i=0; i< count-1; i++) {
-                const product = items.nth(i)
-                await page.product.hover()
+        for (let i=0; i< count; i++) {
+            await expect(items.nth(i)).toBeVisible()
+        }
+        console.log('Number of items found: ', count)
 
-                await product
-                    .locator('div.overlay-content')
-                    .locator('a[class="btn btn-default add-to-cart"]')
-                    .click()
+        for (let i=0; i< count; i++) {
+                const item = items.nth(i)
+                await item.hover()
 
-//    await page.locator('.product-image-wrapper').nth(0).hover()
-//    await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+                await page.waitForTimeout(200)
+
+                await item
+                     .locator('.product-overlay .overlay-content a.add-to-cart').scrollIntoViewIfNeeded()
+
+                await item
+                    .locator('.product-overlay .overlay-content a.add-to-cart').click()
 
 
-                await page.getByRole('button', {name: 'Continue Shopping'}).click()
 
+              await page.getByRole('button', {name: 'Continue Shopping'}).click()
             }
 
+        await page.getByRole('link', {name: 'Cart'}).click()
+
+        let addedItemsNames = []
+
+        for(const name of addedItemsNames) {
+            const cartItem = page.locator('.cart_info_table li:hasText("Top")')
+            await expect(cartItem).toBeVisible()
+        }
+
+        await page.getByRole('link', {name:'Signup / Login'}).click()
+
+        await pm.loginPage.login(`${TEST_EMAIL}`, `${TEST_PASSWORD}`)
+
+        await page.getByRole('link', {name: 'Cart'}).click()
+
+        for(const name of addedItemsNames) {
+            const cartItem = page.locator('.cart_info_table li:hasText("Top")')
+            await expect(cartItem).toBeVisible()
+        }
     })
 
 
@@ -588,7 +608,9 @@ test.describe('User Tests', () => {
 
 
 
-        
+
+
+
 
 
 
