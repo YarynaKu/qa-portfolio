@@ -634,6 +634,14 @@ test.describe('User Tests', () => {
 
     test.only("23 Verify address details in checkout page", async({page}) => {
 
+
+        await page.getByRole('link', {name:'Signup / Login'}).click()
+        await expect(page.getByText('Login to your account')).toBeVisible();
+        await pm.loginPage.login(`${TEST_EMAIL}`, `${TEST_PASSWORD}`)
+        await expect(page.getByText(TEST_USER)).toBeVisible()
+        await page.getByRole('link', {name: 'Delete Account'}).click()
+
+
         await page.getByRole('link', {name:'Signup / Login'}).click()
         await expect(page.getByText('New User Signup!')).toBeVisible();
 
@@ -655,8 +663,8 @@ test.describe('User Tests', () => {
         await expect(page.getByText(TEST_USER)).toBeVisible()
 
 
-        const products = page.locator('.product-overlay .overlay-content')
-                const count = await products.count()
+        const products = page.locator('.product-image-wrapper .overlay-content')
+        const count = await products.count()
                 const randomIndex = Math.floor(Math.random() * count)
                 const selectedItem = products.nth(randomIndex)
                 const productName = await selectedItem.locator('p').innerText()
@@ -665,6 +673,15 @@ test.describe('User Tests', () => {
 
         await page.locator('.modal-content').locator('a[href="/view_cart"]').click()
         await expect(page.locator('#cart_info_table td.cart_description h4 a', {hasText: productName })).toBeVisible()
+
+        await page.locator('#do_action .btn.btn-default.check_out').click()
+
+        const deliveryAddress = await page.locator('#address_delivery').innerText()
+
+        const userData = 'YOUR DELIVERY ADDRESS\nMrs. YaTest User\nGoogle\nSilicon Valley\nGuess what\nToronto Atlantica 46971\nCanada\n0375839284'
+        expect(deliveryAddress).toBe(userData)
+        await page.pause()
+
 
 
 
