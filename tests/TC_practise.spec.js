@@ -68,8 +68,8 @@ test.describe('User Tests', () => {
     await pm.loginPage.login(`${TEST_EMAIL}`, `${TEST_PASSWORD}`)
     await expect(page.getByText(TEST_USER)).toBeVisible()
 
-    // await page.getByRole('link', {name: 'Delete Account'}).click()
-    // await expect(page.getByText('Account Deleted!')).toBeVisible()
+     await page.getByRole('link', {name: 'Delete Account'}).click()
+     await expect(page.getByText('Account Deleted!')).toBeVisible()
     // await page.pause()
 })
 
@@ -616,60 +616,62 @@ test.describe('User Tests', () => {
 
     })
 
-    test.only("22 Add to cart from Recommended items", async({page}) => {
+    test("22 Add to cart from Recommended items", async({page}) => {
         await expect(page.getByRole('heading', {name: 'Recommended items'})).toBeVisible()
 
-        const recommendedItems = page.locator('.recommended_items .carousel-inner .item')
-        const count = await recommendedItems.count()
+        const items = page.locator('#recommended-item-carousel .item.active .productinfo')
+        const count = await items.count()
 
-        let addedProductsNames = []
+        const randomIndex = Math.floor(Math.random() * count)
+        const selectedItem = items.nth(randomIndex)
+        const productName = await selectedItem.locator('p').innerText()
 
-        for (let i=0; i< count; i++) {
-            const slide = recommendedItems.nth(i)
+        await selectedItem.locator('a.add-to-cart').click()
+        await page.locator('.modal-content').locator('a[href="/view_cart"]').click()
+        await expect(page.locator('#cart_info_table td.cart_description h4 a', {hasText: productName })).toBeVisible()
 
-        const products = slide.locator('.col-sm-4')
-        const productsCount = await products.count()
+    })
 
-        for (let j=0; j< productsCount; j++) {
-            const product = products.nth(j)
+    test.only("23 Verify address details in checkout page", async({page}) => {
 
-            const name = await product.locator('.productinfo p').innerText()
-            addedProductsNames.push(name)
+        await page.getByRole('link', {name:'Signup / Login'}).click()
+        await expect(page.getByText('New User Signup!')).toBeVisible();
 
+        await registerUser (page, {
+            password: 'YaTestPassword!',
+            firstname: 'YaTest',
+            lastname: 'User',
+            company: 'Google',
+            address: 'Silicon Valley',
+            address2: 'Guess what',
+            state: 'Atlantica',
+            city: 'Toronto',
+            zipcode: '46971',
+            mobilenumber: '0375839284',
+        });
 
-        await product.locator('a.add-to-cart').click()
-        }
+        await page.getByRole('link', {name: 'Continue'}).click()
 
-        const viewCartButton = page.locator('.modal-content a[href="/view_cart"]').click()
-        }
-
-        for (const name of addedProductNames) {
-            const cartItem = page.locator(`.cart_info_table li:has-text("${name}")`);
-            await expect(cartItem).toBeVisible();
-        }
-
-
-
-
-
+        await expect(page.getByText(TEST_USER)).toBeVisible()
 
 
-//        locator('a[data-product-id="4"]').click()
-//        await page.locator('.modal-content a[href="/view_cart"]').click()
-//
-//        await page.locator('.cart_info_table li:hasText("Top")')
+        const products = page.locator('.product-overlay .overlay-content')
+                const count = await products.count()
+                const randomIndex = Math.floor(Math.random() * count)
+                const selectedItem = products.nth(randomIndex)
+                const productName = await selectedItem.locator('p').innerText()
+
+        await selectedItem.locator('a.add-to-cart').click()
+
+        await page.locator('.modal-content').locator('a[href="/view_cart"]').click()
+        await expect(page.locator('#cart_info_table td.cart_description h4 a', {hasText: productName })).toBeVisible()
+
+
 
 
 
 
     })
-
-
-
-
-
-
-
 
 
 
