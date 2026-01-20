@@ -662,12 +662,13 @@ test.describe('User Tests', () => {
 
         await expect(page.getByText(TEST_USER)).toBeVisible()
 
-
         const products = page.locator('.product-image-wrapper .overlay-content')
         const count = await products.count()
                 const randomIndex = Math.floor(Math.random() * count)
                 const selectedItem = products.nth(randomIndex)
                 const productName = await selectedItem.locator('p').innerText()
+
+        await page.waitForTimeout(5000)
 
         await selectedItem.locator('a.add-to-cart').click()
 
@@ -676,17 +677,31 @@ test.describe('User Tests', () => {
 
         await page.locator('#do_action .btn.btn-default.check_out').click()
 
-        const deliveryAddress = await page.locator('#address_delivery').innerText()
+        const deliveryAddress = page.locator('#address_delivery')
 
-        const userData = 'YOUR DELIVERY ADDRESS\nMrs. YaTest User\nGoogle\nSilicon Valley\nGuess what\nToronto Atlantica 46971\nCanada\n0375839284'
-        expect(deliveryAddress).toBe(userData)
-        await page.pause()
+        await expect(deliveryAddress).toContainText(/your delivery address/i)
+        await expect(deliveryAddress).toContainText(/Mrs\. YaTest User/i)
+        await expect(deliveryAddress).toContainText(/Google/i)
+        await expect(deliveryAddress).toContainText(/Silicon Valley/i)
+        await expect(deliveryAddress).toContainText(/Guess what/i)
+        await expect(deliveryAddress).toContainText(/Toronto Atlantica/i)
+        await expect(deliveryAddress).toContainText(/46971/i)
+        await expect(deliveryAddress).toContainText(/Canada/i)
+        await expect(deliveryAddress).toContainText(/0375839284/i)
 
+        const billingAddress = page.locator('#address_invoice')
 
+        await expect(billingAddress).toContainText(/your billing address/i)
+        await expect(billingAddress).toContainText(/Mrs\. YaTest User/i)
+        await expect(billingAddress).toContainText(/Google/i)
+        await expect(billingAddress).toContainText(/Silicon Valley/i)
+        await expect(billingAddress).toContainText(/Guess what/i)
+        await expect(billingAddress).toContainText(/Toronto Atlantica/i)
+        await expect(billingAddress).toContainText(/46971/i)
+        await expect(billingAddress).toContainText(/Canada/i)
+        await expect(billingAddress).toContainText(/0375839284/i)
 
-
-
-
+        await page.getByRole('link', {name: 'Delete Account'}).click()
 
     })
 
