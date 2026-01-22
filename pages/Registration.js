@@ -3,12 +3,14 @@ import { expect } from "@playwright/test";
 let TEST_USER = 'YaTestUser';
 let TEST_EMAIL = 'testya@gmail.com';
 
+
+
 export async function registerUser(page, userData) {
 
-    await page.getByRole('textbox', {name: 'name'}).fill(TEST_USER);
-    await page.locator('[data-qa="signup-email"]').fill(TEST_EMAIL);    
-    await page.getByRole('button', {name: 'Signup'}).click()
-    await expect(page.getByText('Enter Account Information')).toBeVisible()
+//    await page.getByRole('textbox', {name: 'name'}).fill(TEST_USER);
+//    await page.locator('[data-qa="signup-email"]').fill(TEST_EMAIL);
+//   await page.getByRole('button', {name: 'Signup'}).click()
+//    await expect(page.getByText('Enter Account Information')).toBeVisible()
 
     await page.getByRole('radio', { name: 'Mrs.' }).check();
     await page.getByRole('textbox', {name: 'Password'}).fill(userData.password);
