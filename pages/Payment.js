@@ -14,5 +14,5 @@ export async function Payment(page, paymentData) {
 
     page.getByRole('button', {name: 'Pay and Confirm Order'}).click()
 
-    
+    //
 }
