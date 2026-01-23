@@ -16,7 +16,6 @@ let INCORR_TEST_EMAIL = 'testyaya@gmail.com';
 
 test.beforeEach(async ({page}) =>{
 
-
     await page.goto("https://automationexercise.com/")
     await expect(page.getByAltText('Website for automation practice')).toBeVisible()
 

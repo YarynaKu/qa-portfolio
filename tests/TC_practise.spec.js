@@ -30,7 +30,6 @@ const userData = {
 
 test.beforeEach(async ({page}) =>{
 
-
     await page.goto("https://automationexercise.com/")
     await expect(page.getByAltText('Website for automation practice')).toBeVisible()
 
@@ -228,7 +227,7 @@ test.beforeEach(async ({page}) =>{
 
     })
 
-    test.only("24 Download Invoice after purchase order", async ({page}) => {
+    test("24 Download Invoice after purchase order", async ({page}) => {
 
         const products = page.locator('.product-image-wrapper .overlay-content')
 
@@ -319,6 +318,26 @@ test.beforeEach(async ({page}) =>{
         await page.getByRole('link', {name: 'Delete Account'}).click()
 
     })
+
+    test("25 Verify scroll up using 'Arrow' button and scroll down functionality", async ({page}) => {
+
+        await page.getByText('Copyright © 2021 All rights reserved').scrollIntoViewIfNeeded();
+        await expect(page.getByRole('heading', {name: 'Subscription'})).toBeVisible()
+        await page.locator('#scrollUp').click()
+        await expect(page.locator('#slider-carousel .carousel-inner h2', {hasText: 'Full-Fledged practice website for Automation Engineers'}).first()).toBeVisible()
+    })
+
+    test(" 26 Verify scroll up without 'Arrow' button and scroll down functionality", async ({page}) => {
+
+        await page.getByText('Copyright © 2021 All rights reserved').scrollIntoViewIfNeeded();
+        await expect(page.getByRole('heading', {name: 'Subscription'})).toBeVisible()
+        await page.locator('#header').scrollIntoViewIfNeeded()
+        await expect(page.locator('#slider-carousel .carousel-inner h2', {hasText: 'Full-Fledged practice website for Automation Engineers'}).first()).toBeVisible()
+
+
+
+    })
+
 
 
 
