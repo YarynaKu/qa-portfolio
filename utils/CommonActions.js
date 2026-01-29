@@ -24,4 +24,9 @@ export default class CommonActions {
         return await this.page.isChecked(selector)
     }
 
+    async selectOption(selector, value){
+        await this.page.selectOption(selector, value)
+    }
+
+
 }
