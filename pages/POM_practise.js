@@ -1,11 +1,24 @@
 import LoginPage from "./LoginPage.js";
-//import signupPage from "./SignUpPage";
+import SignupPage from "./SignUpPage.js";
+import RegisterUser from "./RegistrationPage.js";
+import MenuBar from "./MenuBar.js";
+import SubscriptionFooter from "./SubscriptionFooterPage.js";
+import ProductsPage from "./ProductsPage.js";
+import ProductsCategory from "./ProductsCategory.js";
 
 export default class PomManager {
 
     constructor(page){
         this.page = page;
         this.loginPage = new LoginPage(page)
-//        this.signupPage = new signupPage(page)
+        this.signupPage = new SignupPage(page)
+        this.registerUser = new RegisterUser(page)
+        this.menuBar = new MenuBar(page)
+        this.subscriptionFooter = new SubscriptionFooter(page)
+//        this.homePage = new HomePage(page)
+        this.productsPage = new ProductsPage(page)
+        this.productsCategory = new ProductsCategory(page)
+//        this.cartPage = new CartPage(page)
+//        this.contactUsPage = new ContactUsPage(page)
     }
 }
