@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise";
-import { searchProducts, categories } from "../data/variables.js";
+import { searchProducts, categories, brands } from "../data/variables.js";
 
 let pm;
 
@@ -76,7 +76,7 @@ test.beforeEach(async ({page}) =>{
            pm.productsCategory.openSubCategory(categories[0].sub[0])
            await page.waitForTimeout(1000)
 
-           pm.productsCategory.verifyCategoryHeading(categories[0].main, categories[0].sub[0])
+           await pm.productsCategory.verifyCategoryHeading(categories[0].main, categories[0].sub[0])
            })
 
            await test.step('Verify that user is navigated to another category page', async () => {
@@ -85,24 +85,26 @@ test.beforeEach(async ({page}) =>{
            pm.productsCategory.openSubCategory(categories[1].sub[0])
            await page.waitForTimeout(1000)
 
-           pm.productsCategory.verifyCategoryHeading(categories[1].main, categories[1].sub[0])
+           await pm.productsCategory.verifyCategoryHeading(categories[1].main, categories[1].sub[0])
            })
     })
 
-    test("19 View & Cart Brand Products", async({page}) => {
+    test.only("19 View & Cart Brand Products", async({page}) => {
 
-                        await page.getByRole('link', {name: 'Products'}).click();
+//                        await page.getByRole('link', {name: 'Products'}).click();
+        pm.menuBar.navigateToProducts()
 
-                        await expect(page.getByRole('heading', {name: "Brands"})).toBeVisible()
+        await pm.productsBrands.verifyBrandsTitle()
 
-                        await page.locator('[href="/brand_products/H&M"]').click()
-
-                        await expect(page.getByRole('heading', {name: "Brand - H&M Products"})).toBeVisible()
-
-                        await page.locator('[href="/brand_products/Madame"]').click()
-
-                        await expect(page.getByRole('heading', {name: "Brand - Madame Products"})).toBeVisible()
-                    })
+        pm.productsBrands.chooseBrand(brands[1])
+//        await page.locator('[href="/brand_products/H&M"]').click()
+        await pm.productsBrands.verifyBrandHeading(brands[1])
+//        await expect(page.getByRole('heading', {name: "Brand - H&M Products"})).toBeVisible()
+        pm.productsBrands.chooseBrand(brands[2])
+//        await page.locator('[href="/brand_products/Madame"]').click()
+        await pm.productsBrands.verifyBrandHeading(brands[2])
+//        await expect(page.getByRole('heading', {name: "Brand - Madame Products"})).toBeVisible()
+    })
 
     test("20 Search Products and Verify Cart after Login", async({page}) => {
 

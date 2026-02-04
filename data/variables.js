@@ -35,3 +35,6 @@ export const categories = [
     { main: 'Men', sub: ['TShirts', 'Jeans'] },
     { main: 'Kids', sub: ['Dress', 'Tops & Shirts'] }
 ];
+
+export const brands = [
+    'Polo', 'H&M', 'Madame', 'Mast & Harbour', 'Babyhug', 'Allen Solly Junior', 'Kookie Kids', 'Biba' ];
