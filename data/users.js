@@ -24,4 +24,14 @@ export const registeredUser = {
     city: 'Toronto',
     zipcode: '46971',
     mobileNumber: '0375839284'
-}
+};
+
+export let searchProducts = {
+    existingProduct: 'Dress'
+};
+
+export const categories = [
+    { main: 'Women', sub: ['Dress', 'Tops', 'Saree'] },
+    { main: 'Men', sub: ['TShirts', 'Jeans'] },
+    { main: 'Kids', sub: ['Dress', 'Tops & Shirts'] }
+];
