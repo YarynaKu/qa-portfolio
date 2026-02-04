@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise.js";
-import { validUser, invalidUser } from "../data/users.js";
+import { validUser, invalidUser } from "../data/variables.js";
 
 let pm;
 

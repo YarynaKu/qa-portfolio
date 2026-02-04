@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 import CommonActions from "../utils/CommonActions.js";
-import { searchProducts } from "../data/users.js";
+import { searchProducts } from "../data/variables.js";
 
 export default class ProductsPage {
 
