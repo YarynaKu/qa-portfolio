@@ -6,7 +6,7 @@ let pm;
 
 test.beforeEach(async ({page}) => {
 
-    await page.goto("/login")
+    await page.goto("/")
     await expect(page.getByAltText('Website for automation practice')).toBeVisible()
 
     page.on('popup', async popup => {
