@@ -1,13 +1,12 @@
 import { test, expect } from "@playwright/test"
 import  PomManager  from "../pages/POM_practise";
-import { Payment } from "../pages/Payment";
 import { validUser, registeredUser } from "../data/users.js";
 
 let pm;
 
 test.beforeEach(async ({page}) =>{
 
-    await page.goto("/login")
+    await page.goto("/")
     await expect(page.getByAltText('Website for automation practice')).toBeVisible()
 
     page.on('popup', async popup => {
@@ -30,7 +29,7 @@ test.describe('Register User Tests', () => {
 
     await pm.signupPage.signup(validUser.name, validUser.email)
 
-    await expect(page.getByText('Enter Account Information')).toBeVisible()
+    await expect(page.getByText('Enter Account Information')).toBeVisible();
 
     await pm.registerUser.registration (page, {
 
