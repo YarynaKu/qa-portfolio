@@ -125,93 +125,28 @@ test.beforeEach(async ({page}) =>{
        })
 
     test("21 Add review on product", async({page}) => {
-                   await page.getByRole('link', {name: 'Products'}).click();
 
-                   await expect(page.getByRole('heading', {name: 'All Products'})).toBeVisible()
-                   await page.locator('a[href="/product_details/1"]').click()
+           await pm.menuBar.navigateToProducts()
+           await pm.productsPage.verifyAllProductsHeading()
 
-                   await expect(page.getByRole('link', {name: 'Write Your Review'})).toBeVisible()
+           await pm.addRandomProduct.clickRandomViewProduct()
 
-                   await page.getByRole('textbox', {name: 'Your Name'}).fill(TEST_USER)
-                   await page.locator('#email').fill(TEST_EMAIL)
-                   await page.getByRole('textbox', {name: 'Add Review Here!'}).fill('This is my review. Great product!')
+           await pm.productDetails.verifyWriteReviewSection()
+           await pm.productDetails.writeReview(validUser.name, validUser.email, 'Great product!')
 
-                   await page.getByRole('button', {name: 'Submit'}).click()
+           await pm.productDetails.verifyReviewSubmission()
 
-                   await expect(page.getByText('Thank you for your review.')).toBeVisible()
-
-               })
+    })
 
     test("22 Add to cart from Recommended items", async({page}) => {
-            await expect(page.getByRole('heading', {name: 'Recommended items'})).toBeVisible()
 
-            const items = page.locator('#recommended-item-carousel .item.active .productinfo')
-            const count = await items.count()
+          await pm.recommendedItems.verifyRecommendedItemsSection()
 
-            const randomIndex = Math.floor(Math.random() * count)
-            const selectedItem = items.nth(randomIndex)
-            const productName = await selectedItem.locator('p').innerText()
+          await pm.recommendedItems.addRandomRecommendedItemToCart()
+          await pm.recommendedItems.goToCartFromRecommendedItems()
 
-            await selectedItem.locator('a.add-to-cart').click()
-            await page.locator('.modal-content').locator('a[href="/view_cart"]').click()
-            await expect(page.locator('#cart_info_table td.cart_description h4 a', {hasText: productName })).toBeVisible()
-
-
+          await pm.recommendedItems.VerifyProduct()
     })
 
+})
 
-    })
-
-
-
-//       test("20 Search Products and Verify Cart after Login", async({page}) => {
-//
-//           pm.menuBar.navigateToProducts()
-//
-//           await pm.productsPage.verifyAllProductsHeading()
-//           pm.productsPage.searchForProduct(searchProducts.existingProduct)
-//    //       await page.getByRole('textbox', {name: 'Search Product'}).fill('top')
-//    //                        await page.locator('id=submit_search').click()
-//
-//           const items = page.locator('.product-image-wrapper .single-products:has(.productinfo.text-center p:has-text("Top"))')
-//               const count = await items.count()
-//                   for (let i=0; i< count; i++) {
-//                       await expect(items.nth(i)).toBeVisible()
-//                       }
-//                   console.log('Number of items found: ', count)
-//
-//                   for (let i=0; i< count; i++) {
-//                        const item = items.nth(i)
-//                        await item.hover()
-//
-//                        await page.waitForTimeout(200)
-//
-//                        await item
-//                              .locator('.product-overlay .overlay-content a.add-to-cart').scrollIntoViewIfNeeded()
-//
-//                        await item
-//                              .locator('.product-overlay .overlay-content a.add-to-cart').click()
-//
-//                        await page.getByRole('button', {name: 'Continue Shopping'}).click()
-//                   }
-//
-//                   await page.getByRole('link', {name: 'Cart'}).click()
-//
-//                            let addedItemsNames = []
-//
-//                            for(const name of addedItemsNames) {
-//                                const cartItem = page.locator('.cart_info_table li:hasText("Top")')
-//                                await expect(cartItem).toBeVisible()
-//                            }
-//
-//                            await page.getByRole('link', {name:'Signup / Login'}).click()
-//
-//                            await pm.loginPage.login(validUser.email, validUser.password)
-//
-//                            await page.getByRole('link', {name: 'Cart'}).click()
-//
-//                            for(const name of addedItemsNames) {
-//                                const cartItem = page.locator('.cart_info_table li:hasText("Top")')
-//                                await expect(cartItem).toBeVisible()
-//                            }
-//                        })
