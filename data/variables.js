@@ -27,7 +27,8 @@ export const registeredUser = {
 };
 
 export let searchProducts = {
-    existingProduct: 'Dress'
+    existingProduct: 'Dress',
+    searchedProduct: /Dress/
 };
 
 export const categories = [
