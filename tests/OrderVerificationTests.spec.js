@@ -2,21 +2,13 @@ import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise";
 import { Payment } from "../pages/Payment";
 import { deleteUser } from "../pages/DeleteUser";
+import { products, validUser, registerUser } from "../data/variables";
 
 let pm;
 
-let TEST_USER = 'YaTestUser';
-let TEST_EMAIL = 'testya@gmail.com';
-let TEST_PASSWORD = 'YaTestPassword!';
-let INCORR_TEST_PASSWORD = 'YayaTestPassword!';
-let INCORR_TEST_EMAIL = 'testyaya@gmail.com';
-
-
-
 test.beforeEach(async ({page}) =>{
 
-
-    await page.goto("https://automationexercise.com/")
+    await page.goto("/")
     await expect(page.getByAltText('Website for automation practice')).toBeVisible()
 
     page.on('popup', async popup => {
@@ -34,99 +26,101 @@ test.describe("Orders Tests", () => {
 
     test("12 Add Products in cart", async ({page}) => {
 
-            await page.getByRole('link', {name: 'Products'}).click();
+        await pm.menuBar.navigateToProducts()
 
-                await test.step('Adding products to the cart', async() => {
+           await test.step('Adding 1 and 2 products to the cart', async() => {
 
-                    await page.locator('.product-image-wrapper').nth(0).hover()
-                    await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+               await pm.productsPage.addProductById(1)
 
-                    await page.getByRole('button', {name: 'Continue Shopping'}).click()
+               await pm.productsPage.continueShoppingPopUpMessage()
 
-                    await page.locator('.product-image-wrapper').nth(1).hover()
-                    await page.locator('div.overlay-content').locator('a[data-product-id="2"]').click()
+               await pm.productsPage.addProductById(2)
+           })
 
-                })
+           await test.step('Viewing the cart', async() => {
 
-                await test.step('Viewing the cart', async() => {
+              await pm.productsPage.goToCartPopUpMessage()
 
-                    await page.getByRole('link', {name: "View Cart"}).click()
+              await pm.productsPage.verifyProductsInCartById(products.product1.id,
+              {
+                    name: products.product1.name,
+                    category: products.product1.category,
+                    price: products.product1.price,
+                    quantity: products.product1.quantity,
+                    total: products.product1.total
+              })
 
-                    const Prod1 = page.locator('tr[id="product-1"]')
-                    const Prod2 = page.locator('tr[id="product-2"]')
-
-                    await expect(Prod1).toBeVisible()
-                    await expect(Prod2).toBeVisible()
-
-                    await expect(Prod1.locator('td.cart_price')).toContainText('Rs. 500')
-                    await expect(Prod1.locator('td.cart_quantity')).toContainText('1')
-                    await expect(Prod1.locator('td.cart_total')).toContainText('Rs. 500')
-
-                    await expect(Prod2.locator('td.cart_price')).toContainText('Rs. 400')
-                    await expect(Prod2.locator('td.cart_quantity')).toContainText('1')
-                    await expect(Prod2.locator('td.cart_total')).toContainText('Rs. 400')
-
-                })
+              await pm.productsPage.verifyProductsInCartById(products.product2.id,
+              {
+                    name: products.product2.name,
+                    category: products.product2.category,
+                    price: products.product2.price,
+                    quantity: products.product2.quantity,
+                    total: products.product2.total
+              })
+           })
         })
 
     test("13 Verify Product quantity in Cart", async ({page}) => {
 
-                await page.locator('a[href="/product_details/5"]').click()
+               const captureName = await pm.addRandomProduct.clickRandomViewProduct()
+               const isMatch = await pm.addRandomProduct.verifyProductDetails(captureName.productName)
+               expect(isMatch).toBe(true)
 
-                await expect(page.locator('img[src="/get_product_picture/5"]')).toBeVisible()
+               await pm.productDetails.setProductQuantity('4')
 
-                await page.locator('#quantity').fill('4')
+               await pm.productDetails.addToCart()
 
-                await page.getByRole('button', {name: 'Add to cart'}).click()
+               await pm.productsPage.goToCartPopUpMessage()
 
-                await page.getByRole('link', {name: "View Cart"}).click()
-
-                const Prod5 = page.locator('tr[id="product-5"]')
-
-                await expect(Prod5).toBeVisible()
-
-                await expect(Prod5.locator('td.cart_quantity')).toContainText('4')
+               await pm.addRandomProduct.verifyProductInCart(captureName.productName)
 
             })
 
-    test("14 Place Order: Register while Checkout", async ({page}) => {
+    test.only("14 Place Order: Register while Checkout", async ({page}) => {
 
     await test.step('Adding products to the cart', async() => {
 
-        await page.locator('.product-image-wrapper').nth(0).hover()
-        await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
+        await pm.productsPage.addRandomProduct()
 
-        await page.getByRole('button', {name: 'Continue Shopping'}).click()
+        await pm.productsPage.continueShoppingPopUpMessage()
 
-        await page.locator('.product-image-wrapper').nth(1).hover()
-        await page.locator('div.overlay-content').locator('a[data-product-id="2"]').click()
+        await pm.productsPage.addRandomProduct()
     })
 
     await test.step('View Cart', async() => {
 
-        await page.getByRole('link', {name: "View Cart"}).click()
+        await pm.productsPage.goToCartPopUpMessage()
 
-        await expect(page.locator('li[class="active"]')).toHaveText('Shopping Cart')
+        await pm.cartPage.verifyCartHeading()
 
-        await page.locator('a[class="btn btn-default check_out"]').click()
+        await pm.cartPage.clickCheckOutBtn()
 
-        await page.locator('div.modal-content').locator('a[href="/login"]').click()
+        await pm.cartPage.clickRegisterPopupCheckout()
     })
 
     await test.step('Register User', async() => {
 
-        await registerUser(page, {
-            password: 'YaTestPassword!',
-            firstname: 'YaTest',
-            lastname: 'User',
-            company: 'Google',
-            address: 'Silicon Valley',
-            address2: 'Guess what',
-            state: 'Atlantica',
-            city: 'Toronto',
-            zipcode: '46971',
-            mobilenumber: '0375839284',
-    });
+    await pm.signupPage.signup(validUser.name, validUser.email)
+
+            await pm.registerUser.registration (page, {
+
+                password: validUser.password,
+                day: registeredUser.birthDate,
+                month: registeredUser.birthMonth,
+                year: registeredUser.birthYear,
+                firstname: registeredUser.firstName,
+                lastname: registeredUser.lastName,
+                company: registeredUser.company,
+                address: registeredUser.address,
+                address2: registeredUser.address2,
+                country: registeredUser.country,
+                state: registeredUser.state,
+                city: registeredUser.city,
+                zipcode: registeredUser.zipcode,
+                mobilenumber: registeredUser.mobileNumber,
+
+            });
 
         await page.getByRole('link', {name: 'Continue'}).click()
     })
