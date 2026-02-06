@@ -143,9 +143,9 @@ test.beforeEach(async ({page}) =>{
           await pm.recommendedItems.verifyRecommendedItemsSection()
 
           await pm.recommendedItems.addRandomRecommendedItemToCart()
-          await pm.recommendedItems.goToCartFromRecommendedItems()
+          await pm.productsPage.goToCartFromPopUpMessage()
 
-          await pm.recommendedItems.VerifyProduct()
+          await pm.recommendedItems.VerifyProductInCart()
     })
 
 })
