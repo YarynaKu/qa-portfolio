@@ -40,6 +40,14 @@ export const products = {
     }
 };
 
+export const payCart = {
+    cardName: "YaTest",
+    cardNumber: '1234567890',
+    cvc: '123',
+    expMonth: '01',
+    expYear: '01'
+}
+
 export const categories = [
     { main: 'Women', sub: ['Dress', 'Tops', 'Saree'] },
     { main: 'Men', sub: ['TShirts', 'Jeans'] },
