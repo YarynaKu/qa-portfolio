@@ -6,6 +6,10 @@ import SubscriptionFooter from "./SubscriptionFooterPage.js";
 import ProductsPage from "./ProductsPage.js";
 import ProductsCategory from "./ProductsCategory.js";
 import ProductsBrands from "./ProductsBrands.js";
+import AddRandomProduct from "./AddRandomProduct.js";
+import ProductDetails from "./ProductDetails.js";
+import RecommendedItems from "./RecommendedItems.js";
+import CartPage from "./CartPage.js";
 
 export default class PomManager {
 
@@ -20,7 +24,10 @@ export default class PomManager {
         this.productsPage = new ProductsPage(page)
         this.productsCategory = new ProductsCategory(page)
         this.productsBrands = new ProductsBrands(page)
-//        this.cartPage = new CartPage(page)
+        this.addRandomProduct = new AddRandomProduct(page)
+        this.productDetails = new ProductDetails(page)
+        this.recommendedItems = new RecommendedItems(page)
+        this.cartPage = new CartPage(page)
 //        this.contactUsPage = new ContactUsPage(page)
     }
 }
