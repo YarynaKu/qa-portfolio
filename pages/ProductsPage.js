@@ -14,6 +14,8 @@ export default class ProductsPage {
 
         this.searchResult = page.getByRole('heading', {name: 'Searched Products'})
 
+        this.continueShopping = page.getByRole('button', {name: 'Continue Shopping'})
+
         this.relatedSearchResult = page.locator('p').filter({ hasText: searchProducts.existingProduct })
 
         this.cartLink = page.getByRole('link', { name: 'Cart' });
@@ -24,6 +26,46 @@ export default class ProductsPage {
     async verifyAllProductsHeading(){
         await expect(this.allProductsHeading).toBeVisible()
     }
+
+    async addProductById(productId){
+        const productWrapper = this.page.locator('.product-image-wrapper')
+                                   .filter({ has: this.page.locator(`a[data-product-id="${productId}"]`) });
+
+        await productWrapper.hover();
+
+        await productWrapper
+              .locator('.overlay-content')
+              .locator(`a[data-product-id="${productId}"]`)
+              .click();
+
+    }
+
+    async verifyProductsInCartById(productId, expected) {
+        await expect(this.page.locator('#cart_info_table')).toBeVisible();
+
+           const itemRow = this.page.locator('#cart_info_table tr')
+                                     .filter({ has: this.page.locator(`a[data-product-id="${productId}"]`) });
+
+           await expect(itemRow).toBeVisible();
+
+           await expect(itemRow.locator('.cart_description h4 a'))
+               .toHaveText(expected.name);
+
+           await expect(itemRow.locator('.cart_description p'))
+               .toHaveText(expected.category);
+
+           await expect(itemRow.locator('.cart_price p'))
+               .toHaveText(expected.price);
+
+           await expect(itemRow.locator('.cart_quantity button'))
+               .toHaveText(expected.quantity);
+
+           await expect(itemRow.locator('.cart_total_price'))
+               .toHaveText(expected.total);
+
+    }
+
+
 
     async searchForProduct(productName){
         await this.actions.fill(this.searchProduct, productName)
@@ -73,6 +115,15 @@ export default class ProductsPage {
        await this.cartLink.click();
        }
 
+    async goToCartPopUpMessage() {
+       await this.page.locator('.modal-content').locator('a[href="/view_cart"]').click()
+    }
+
+    async continueShoppingPopUpMessage() {
+       await this.continueShopping.click();
+    }
+
+
     async verifyProductsInCart(productName) {
         await expect(this.page.locator('#cart_info_table')).toBeVisible();
         const itemRows = this.page.locator('#cart_info_table tr').filter({ hasText: productName })
@@ -81,6 +132,21 @@ export default class ProductsPage {
         for (let i = 0; i < count; i++) {
             await expect(itemRows.nth(i)).toBeVisible();
         }
-        }
+    }
+
+    async addRandomProduct(){
+
+       const products = this.page.locator('.product-image-wrapper .overlay-content')
+       const count = await products.count()
+
+       const randomIndex = Math.floor(Math.random() * count)
+       const selectedItem = products.nth(randomIndex)
+       const productName = await selectedItem.locator('p').innerText()
+
+       await products.first().waitFor({ state: 'visible' });
+
+       await selectedItem.locator('a.add-to-cart').evaluate(el => el.click())
+    }
+
 
 }
