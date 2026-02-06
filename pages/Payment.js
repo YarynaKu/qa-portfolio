@@ -1,18 +1,38 @@
 import { expect } from "@playwright/test";
+import CommonActions from "../utils/CommonActions.js";
 
-export async function Payment(page, paymentData) {
+export default class Payment{
 
-    await page.locator('[name="name_on_card"]').fill(paymentData.nameoncard)
+     constructor(page){
+        this.actions = new CommonActions(page)
+        this.page = page
 
-    await page.locator('[name="card_number"]').fill(paymentData.cardnumber)
+        this.cardName = '[name="name_on_card"]'
+        this.cardNumber = '[name="card_number"]'
+        this.cvc = '[data-qa="cvc"]'
+        this.expMonth = '[data-qa="expiry-month"]'
+        this.expYear = '[data-qa="expiry-year"]'
+        this.payBtn = '[data-qa="pay-button"]'
+        this.successMessage = '[data-qa="order-placed"]'
+     }
 
-    await page.getByRole('textbox', {name: 'ex. 311'}).fill(paymentData.cvc)
 
-    await page.getByRole('textbox', {name: 'MM'}).fill(paymentData.expmonth)
+     async enterPaymentDetails(cardName, cardNumber, cvc, expMonth, expYear) {
 
-    await page.getByRole('textbox', {name: 'YYYY'}).fill(paymentData.expyear)
+        await this.actions.fill(this.cardName, cardName);
+        await this.actions.fill(this.cardNumber, cardNumber);
+        await this.actions.fill(this.cvc, cvc);
+        await this.actions.fill(this.expMonth, expMonth);
+        await this.actions.fill(this.expYear, expYear);
+     }
 
-    page.getByRole('button', {name: 'Pay and Confirm Order'}).click()
+     async clickPayAndConfirm() {
+        await this.actions.click(this.payBtn);
+     }
 
-    //
+     async verifyPaymentSuccess() {
+        await expect(this.page.locator('.alert-success')).toHaveCount(1);
+     }
+
+
 }
