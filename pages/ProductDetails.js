@@ -8,6 +8,7 @@ export default class ProductDetails {
 
         this.writeReviewSelector = 'a[href="#reviews"]'
         this.thanksMessage = page.getByText('Thank you for your review.')
+        this.quantitySelector = '#quantity'
 
     }
 
@@ -25,4 +26,13 @@ export default class ProductDetails {
     async verifyReviewSubmission() {
         await expect(this.thanksMessage).toBeVisible();
     }
+
+    async setProductQuantity(quantity) {
+        await this.actions.fill(this.quantitySelector, quantity);
+    }
+
+    async addToCart() {
+        await this.page.getByRole('button', { name: 'Add to cart' }).click();
+    }
+
 }
