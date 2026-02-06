@@ -26,11 +26,7 @@ export default class RecommendedItems {
         await selectedItem.locator('a.add-to-cart').click()
     }
 
-    async goToCartFromRecommendedItems() {
-        await this.page.locator('.modal-content').locator('a[href="/view_cart"]').click()
-    }
-
-    async VerifyProduct(productName) {
+    async VerifyProductInCart(productName) {
         await expect(this.page.locator('#cart_info_table td.cart_description h4 a', {hasText: productName })).toBeVisible()
     }
 
