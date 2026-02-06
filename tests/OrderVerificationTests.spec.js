@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise";
 import { Payment } from "../pages/Payment";
 import { deleteUser } from "../pages/DeleteUser";
-import { products, validUser, registerUser } from "../data/variables";
+import { products, validUser, registeredUser, payCart } from "../data/variables";
 
 let pm;
 
@@ -77,7 +77,7 @@ test.describe("Orders Tests", () => {
 
             })
 
-    test.only("14 Place Order: Register while Checkout", async ({page}) => {
+    test("14 Place Order: Register while Checkout", async ({page}) => {
 
     await test.step('Adding products to the cart', async() => {
 
@@ -127,65 +127,68 @@ test.describe("Orders Tests", () => {
 
     await test.step('Place Order', async() => {
 
-        await expect(page.getByText(TEST_USER)).toBeVisible()
+        await expect(page.getByText(validUser.name)).toBeVisible()
 
-        await page.getByRole('link', {name: 'Cart'}).click()
+        await pm.menuBar.navigateToCart()
 
-        await page.locator('a[class="btn btn-default check_out"]').click()
+        await pm.cartPage.clickCheckOutBtn()
 
-        await expect(page.getByRole('heading', {name: 'Address Details'})).toBeVisible()
+        await pm.cartPage.verifyAddressDetailsHeading()
+        await pm.cartPage.verifyReviewOrderHeading()
 
-        await expect(page.getByRole('heading', {name: 'Review Your Order'})).toBeVisible()
-
-        await page.locator('textarea[class="form-control"]').fill('Hello! Please put it in a gift bag')
-
-        await page.getByRole('link', {name: 'Place Order'}).click()
+        await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
 
     })
 
     await test.step('Proceed with a payment', async() => {
 
-        await Payment (page, {
-            nameoncard: 'YaTest',
-            cardnumber: '1234567890',
-            cvc: '123',
-            expmonth: '01',
-            expyear: '01',
-    });
+        await pm.payment.enterPaymentDetails(
+            payCart.cardName,
+            payCart.cardNumber,
+            payCart.cvc,
+            payCart.expMonth,
+            payCart.expYear
+        )
 
-    await expect(page.locator('.alert-success')).toHaveCount(1)
-    })
-
-    await deleteUser(page)
+        await pm.payment.clickPayAndConfirm()
+        await pm.payment.verifyPaymentSuccess()
 
     })
 
-    test("15 Place Order: Register before Checkout", async({page}) => {
+    await pm.deleteUser.deleteUser()
 
-        await page.getByRole('link', {name:'Signup / Login'}).click()
+    })
 
-        await registerUser(page, {
-            password: 'YaTestPassword!',
-            firstname: 'YaTest',
-            lastname: 'User',
-            company: 'Google',
-            address: 'Silicon Valley',
-            address2: 'Guess what',
-            state: 'Atlantica',
-            city: 'Toronto',
-            zipcode: '46971',
-            mobilenumber: '0375839284',
-        })
+    test.only("15 Place Order: Register before Checkout", async({page}) => {
+
+        await pm.menuBar.navigateToSignupLogin()
+
+        await pm.signupPage.signup(validUser.name, validUser.email)
+
+                    await pm.registerUser.registration (page, {
+
+                        password: validUser.password,
+                        day: registeredUser.birthDate,
+                        month: registeredUser.birthMonth,
+                        year: registeredUser.birthYear,
+                        firstname: registeredUser.firstName,
+                        lastname: registeredUser.lastName,
+                        company: registeredUser.company,
+                        address: registeredUser.address,
+                        address2: registeredUser.address2,
+                        country: registeredUser.country,
+                        state: registeredUser.state,
+                        city: registeredUser.city,
+                        zipcode: registeredUser.zipcode,
+                        mobilenumber: registeredUser.mobileNumber,
+
+                    });
 
         await page.getByRole('link', {name: 'Continue'}).click()
 
-        await expect(page.getByText(TEST_USER)).toBeVisible()
+        await expect(page.getByText(validUser.name)).toBeVisible()
 
-        await test.step('Adding products to the cart', async() => {
-
-            await page.locator('.product-image-wrapper').nth(0).hover()
-            await page.locator('div.overlay-content').locator('a[data-product-id="1"]').click()
-        })
+        await pm.productsPage.addRandomProduct()
 
         await page.getByRole('link', {name: 'Cart'}).click()
 
