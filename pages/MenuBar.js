@@ -33,7 +33,7 @@ export default class MenuBar {
     }
 
     async navigateToSignupLogin(){
-        await this.actions.click(this.signupLoginLink)
+        await this.actions.click2(this.signupLoginLink)
     }
 
     async navigateToLogout(){
@@ -43,5 +43,6 @@ export default class MenuBar {
     async navigateToTestCases(){
         await this.actions.click2(this.testCasesLink)
     }
+
 
 }

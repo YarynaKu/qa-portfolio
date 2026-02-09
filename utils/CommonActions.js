@@ -12,6 +12,10 @@ export default class CommonActions {
         await this.page.click(selector)
     }
 
+    async click2(locator){
+        await locator.click()
+    }
+
     async fill(selector, text){
         await this.page.fill(selector, text)
     }
