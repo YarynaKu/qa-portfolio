@@ -10,6 +10,8 @@ import AddRandomProduct from "./AddRandomProduct.js";
 import ProductDetails from "./ProductDetails.js";
 import RecommendedItems from "./RecommendedItems.js";
 import CartPage from "./CartPage.js";
+import Payment from "./Payment.js";
+import DeleteUser from "./DeleteUser.js"
 
 export default class PomManager {
 
@@ -28,6 +30,8 @@ export default class PomManager {
         this.productDetails = new ProductDetails(page)
         this.recommendedItems = new RecommendedItems(page)
         this.cartPage = new CartPage(page)
+        this.payment = new Payment(page)
+        this.deleteUser = new DeleteUser(page)
 //        this.contactUsPage = new ContactUsPage(page)
     }
 }
