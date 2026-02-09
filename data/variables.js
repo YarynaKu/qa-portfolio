@@ -1,3 +1,4 @@
+import { normalizeText } from "../utils/utils.js"
 
 export const validUser = {
     name: 'YaTestUser',
@@ -25,6 +26,16 @@ export const registeredUser = {
     zipcode: '46971',
     mobileNumber: '0375839284'
 };
+
+export const expectedAddressFields = [
+    normalizeText(`Mrs. ${registeredUser.firstName} ${registeredUser.lastName}`),
+    normalizeText(registeredUser.company),
+    normalizeText(registeredUser.address),
+    normalizeText(registeredUser.address2),
+    normalizeText(`${registeredUser.city} ${registeredUser.state} ${registeredUser.zipcode}`),
+    normalizeText(registeredUser.country),
+    normalizeText(registeredUser.mobileNumber)
+].filter(Boolean);
 
 export let searchProducts = {
     existingProduct: 'Dress',
