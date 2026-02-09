@@ -141,11 +141,14 @@ export default class ProductsPage {
 
        const randomIndex = Math.floor(Math.random() * count)
        const selectedItem = products.nth(randomIndex)
+
        const productName = await selectedItem.locator('p').innerText()
 
        await products.first().waitFor({ state: 'visible' });
 
        await selectedItem.locator('a.add-to-cart').evaluate(el => el.click())
+
+       return { productName }
     }
 
 
