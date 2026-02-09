@@ -34,5 +34,28 @@ export default class Payment{
         await expect(this.page.locator('.alert-success')).toHaveCount(1);
      }
 
+     async downloadInvoice(){
+
+        const fs = require('fs');
+        const path = require('path');
+
+        const [download] = await Promise.all([
+              this.page.waitForEvent('download'),
+              this.page.getByRole('link', {name: 'Download Invoice'}).click()
+        ])
+
+        const fileName = download.suggestedFilename();
+        expect(fileName).toContain('invoice');
+
+        const tempPath = await download.path();
+        const destPath = path.join('downloads', fileName);
+
+        fs.mkdirSync('downloads', { recursive: true });
+        fs.copyFileSync(tempPath, destPath);
+
+        console.log('Invoice saved at:', destPath);
+
+     }
+
 
 }
