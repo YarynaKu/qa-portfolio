@@ -1,10 +1,8 @@
 import { expect } from "@playwright/test";
-import CommonActions from "../utils/CommonActions.js";
 
 export default class ProductsCategory {
     constructor(page) {
-        this.actions = new CommonActions(page)
-        this.page = page
+        this.page = page;
 
         this.categoryTitle = page.getByRole('heading', {name: "Category"})
 
@@ -15,30 +13,34 @@ export default class ProductsCategory {
     }
 
     categorySelector(name) {
-        return `a[href="#${name}"]`;
+        return this.page.locator(`.panel-title a[href="#${name}"]`);
     }
 
-    subCategorySelector(subName) {
-        return `a:has-text("${subName}")`;
+    subCategorySelector(categoryName, subName) {
+        return this.page.locator(`#${categoryName} ul li a:has-text("${subName}")`);
     }
 
     async openCategory(name){
-        await this.actions.click(this.categorySelector(name))
+            const category = this.categorySelector(name)
+       //     const panel = this.page.locator(`#${name}`)
+            await category.click()
+
     }
 
-    async openSubCategory(subName){
-        await this.actions.click(this.subCategorySelector(subName))
+    async openSubCategory(categoryName, subName){
+        const subCategory = this.subCategorySelector(categoryName, subName)
+        await expect(subCategory).toBeVisible({timeout: 1000 })
+        await subCategory.click()
     }
 
     displayedCategoryHeading(name, subName) {
-        return ` ${name} - ${subName} Products`;
+        return `${name} - ${subName}`;
     }
 
     async verifyCategoryHeading(name, subName) {
-
-        await expect(this.page.getByRole('heading', {
-            name: this.displayedCategoryHeading(name, subName)
-            })).toBeVisible();
+        const expectedHeading = this.displayedCategoryHeading(name, subName);
+        const headingLocator = this.page.getByRole('heading', { name: new RegExp(expectedHeading, 'i') })
+        await expect(headingLocator).toBeVisible();
         }
 
 
