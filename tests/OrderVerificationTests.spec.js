@@ -16,31 +16,26 @@ test.beforeEach(async ({page}) =>{
         console.log(await popup.title())
     })
 
-    await page.getByText('This site asks for consent to use your data').click();
-    await page.getByRole('button', {name: 'Consent'}).click();
-
     pm = new PomManager(page)
+
+    await pm.basePage.acceptConsent()
 })
 
 test.describe("Orders Tests", () => {
 
-    test("12 Add Products in cart", async ({page}) => {
-
-        await pm.menuBar.navigateToProducts()
-
-           await test.step('Adding 1 and 2 products to the cart', async() => {
-
-               await pm.productsPage.addProductById(1)
-
-               await pm.productsPage.continueShoppingPopUpMessage()
-
-               await pm.productsPage.addProductById(2)
-           })
-
-           await test.step('Viewing the cart', async() => {
-
-              await pm.productsPage.goToCartPopUpMessage()
-
+    test("Add Products in cart", async ({page}) => {
+        await test.step('Navigate to Products page', async () => {
+            await pm.menuBar.navigateToProducts()
+        })
+        await test.step('Adding 1 and 2 products to the cart', async() => {
+            await pm.productsPage.addProductById(1)
+            await pm.productsPage.continueShoppingPopUpMessage()
+            await pm.productsPage.addProductById(2)
+        })
+        await test.step('View the cart', async() => {
+            await pm.productsPage.goToCartPopUpMessage()
+        })
+        await test.step('Verify products info are visible in the cart', async () => {
               await pm.productsPage.verifyProductsInCartById(products.product1.id,
               {
                     name: products.product1.name,
@@ -49,7 +44,6 @@ test.describe("Orders Tests", () => {
                     quantity: products.product1.quantity,
                     total: products.product1.total
               })
-
               await pm.productsPage.verifyProductsInCartById(products.product2.id,
               {
                     name: products.product2.name,
@@ -58,113 +52,90 @@ test.describe("Orders Tests", () => {
                     quantity: products.product2.quantity,
                     total: products.product2.total
               })
-           })
         })
+    })
 
-    test("13 Verify Product quantity in Cart", async ({page}) => {
+    test("Verify Product quantity in Cart", async ({page}) => {
 
-               const captureName = await pm.addRandomProduct.clickRandomViewProduct()
-               const isMatch = await pm.addRandomProduct.verifyProductDetails(captureName.productName)
-               expect(isMatch).toBe(true)
-
+        const captureName = await test.step('View random product and verify details', async () => {
+            const product = await pm.addRandomProduct.clickRandomViewProduct()
+            const isMatch = await pm.addRandomProduct.verifyProductDetails(product.productName)
+            expect(isMatch).toBe(true)
+            return product;
+        })
+        await test.step('Set product quantity to 4 and add to the cart', async () => {
                await pm.productDetails.setProductQuantity('4')
-
                await pm.productDetails.addToCart()
-
                await pm.productsPage.goToCartPopUpMessage()
-
+        })
+        await test.step('Verify product is added to the cart', async () => {
                await pm.addRandomProduct.verifyProductInCart(captureName.productName)
-
-            })
-
-    test("14 Place Order: Register while Checkout", async ({page}) => {
-
-    await test.step('Adding products to the cart', async() => {
-
-        await pm.productsPage.addRandomProduct()
-
-        await pm.productsPage.continueShoppingPopUpMessage()
-
-        await pm.productsPage.addRandomProduct()
+        })
+        await test.step('Verify product quantity as it was in product details page', async () => {
+               await pm.addRandomProduct.verifyProductQuantityInCart(captureName.productName)
+        })
     })
 
-    await test.step('View Cart', async() => {
-
-        await pm.productsPage.goToCartPopUpMessage()
-
-        await pm.cartPage.verifyCartHeading()
-
-        await pm.cartPage.clickCheckOutBtn()
-
-        await pm.cartPage.clickRegisterPopupCheckout()
+    test("Place Order: Register while Checkout", async ({page}) => {
+        await test.step('Adding random products to the cart', async() => {
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.addRandomProduct.continueShoppingPopUpMessage()
+            await pm.addRandomProduct.addRandomProduct()
+        })
+        await test.step('View Cart and start checkout', async() => {
+            await pm.productsPage.goToCartPopUpMessage()
+            await pm.cartPage.verifyCartHeading()
+            await pm.cartPage.clickCheckOutBtn()
+            await pm.cartPage.clickRegisterPopupCheckout()
+        })
+        await test.step('Register a new User', async() => {
+            await pm.signupPage.signup(validUser.name, validUser.email)
+                await pm.registerUser.registration (page, {
+                    password: validUser.password,
+                    day: registeredUser.birthDate,
+                    month: registeredUser.birthMonth,
+                    year: registeredUser.birthYear,
+                    firstname: registeredUser.firstName,
+                    lastname: registeredUser.lastName,
+                    company: registeredUser.company,
+                    address: registeredUser.address,
+                    address2: registeredUser.address2,
+                    country: registeredUser.country,
+                    state: registeredUser.state,
+                    city: registeredUser.city,
+                    zipcode: registeredUser.zipcode,
+                    mobilenumber: registeredUser.mobileNumber,
+                });
+            await page.getByRole('link', {name: 'Continue'}).click()
+        })
+        await test.step('Place Order with a comment', async() => {
+            await expect(page.getByText(validUser.name)).toBeVisible()
+            await pm.menuBar.navigateToCart()
+            await pm.cartPage.clickCheckOutBtn()
+            await pm.cartPage.verifyAddressDetailsHeading()
+            await pm.cartPage.verifyReviewOrderHeading()
+            await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
+        })
+        await test.step('Enter payment details and confirm', async() => {
+            await pm.payment.enterPaymentDetails(
+                payCart.cardName,
+                payCart.cardNumber,
+                payCart.cvc,
+                payCart.expMonth,
+                payCart.expYear
+            )
+            await pm.payment.clickPayAndConfirm()
+            await pm.payment.verifyPaymentSuccess()
+        })
+        await test.step('Delete the registered user', async() => {
+            await pm.deleteUser.deleteUser()
+        })
     })
 
-    await test.step('Register User', async() => {
-
-    await pm.signupPage.signup(validUser.name, validUser.email)
-
-            await pm.registerUser.registration (page, {
-
-                password: validUser.password,
-                day: registeredUser.birthDate,
-                month: registeredUser.birthMonth,
-                year: registeredUser.birthYear,
-                firstname: registeredUser.firstName,
-                lastname: registeredUser.lastName,
-                company: registeredUser.company,
-                address: registeredUser.address,
-                address2: registeredUser.address2,
-                country: registeredUser.country,
-                state: registeredUser.state,
-                city: registeredUser.city,
-                zipcode: registeredUser.zipcode,
-                mobilenumber: registeredUser.mobileNumber,
-
-            });
-
-        await page.getByRole('link', {name: 'Continue'}).click()
-    })
-
-    await test.step('Place Order', async() => {
-
-        await expect(page.getByText(validUser.name)).toBeVisible()
-
-        await pm.menuBar.navigateToCart()
-
-        await pm.cartPage.clickCheckOutBtn()
-
-        await pm.cartPage.verifyAddressDetailsHeading()
-        await pm.cartPage.verifyReviewOrderHeading()
-
-        await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
-
-    })
-
-    await test.step('Proceed with a payment', async() => {
-
-        await pm.payment.enterPaymentDetails(
-            payCart.cardName,
-            payCart.cardNumber,
-            payCart.cvc,
-            payCart.expMonth,
-            payCart.expYear
-        )
-
-        await pm.payment.clickPayAndConfirm()
-        await pm.payment.verifyPaymentSuccess()
-
-    })
-
-    await pm.deleteUser.deleteUser()
-
-    })
-
-    test("15 Place Order: Register before Checkout", async({page}) => {
-
-        await pm.menuBar.navigateToSignupLogin()
-
-        await pm.signupPage.signup(validUser.name, validUser.email)
-
+    test("Place Order: Register before Checkout", async({page}) => {
+        await test.step('Register a new User', async() => {
+            await pm.menuBar.navigateToSignupLogin()
+            await pm.signupPage.signup(validUser.name, validUser.email)
                     await pm.registerUser.registration (page, {
 
                         password: validUser.password,
@@ -183,27 +154,25 @@ test.describe("Orders Tests", () => {
                         mobilenumber: registeredUser.mobileNumber,
 
                     });
-
-        await page.getByRole('link', {name: 'Continue'}).click()
-
-        await expect(page.getByText(validUser.name)).toBeVisible()
-
-        await pm.productsPage.addRandomProduct()
-
-        await pm.productsPage.goToCartPopUpMessage()
-
-        await pm.cartPage.verifyCartHeading()
-
-        await pm.cartPage.clickCheckOutBtn()
-
-        await pm.cartPage.verifyAddressDetailsHeading()
-
-        await pm.cartPage.verifyReviewOrderHeading()
-
-        await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
-
-        await test.step('Proceed with a payment', async() => {
-
+            await page.getByRole('link', {name: 'Continue'}).click()
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
+        await test.step('Adding random products to the cart', async() => {
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.goToCartPopUpMessage()
+        })
+        await test.step('View Cart and start checkout', async() => {
+            await pm.cartPage.verifyCartHeading()
+            await pm.cartPage.clickCheckOutBtn()
+        })
+        await test.step('View Address and Review Order Details', async() => {
+            await pm.cartPage.verifyAddressDetailsHeading()
+            await pm.cartPage.verifyReviewOrderHeading()
+        })
+        await test.step('Write a comment and place order', async() => {
+            await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
+        })
+        await test.step('Enter payment details and confirm', async() => {
             await pm.payment.enterPaymentDetails(
                 payCart.cardName,
                 payCart.cardNumber,
@@ -211,41 +180,37 @@ test.describe("Orders Tests", () => {
                 payCart.expMonth,
                 payCart.expYear
         )
-
             await pm.payment.clickPayAndConfirm()
             await pm.payment.verifyPaymentSuccess()
         });
-
-        await pm.deleteUser.deleteUser()
+        await test.step('Delete the registered user', async() => {
+            await pm.deleteUser.deleteUser()
+        })
     })
 
-    test("16 Place Order: Login Before Checkout", async({page}) => {
-
-        await pm.menuBar.navigateToSignupLogin()
-        await expect(page.getByText('Login to your account')).toBeVisible();
-
-        await pm.loginPage.login(validUser.email, validUser.password)
-        await expect(page.getByText(validUser.name)).toBeVisible()
-
-        await test.step('Adding products to the cart', async() => {
-
-            await pm.productsPage.addRandomProduct()
+    test("Place Order: Login Before Checkout", async({page}) => {
+        await test.step("Login with valid credentials", async() => {
+            await pm.menuBar.navigateToSignupLogin()
+            await expect(page.getByText('Login to your account')).toBeVisible();
+            await pm.loginPage.login(validUser.email, validUser.password)
+            await expect(page.getByText(validUser.name)).toBeVisible()
         })
-
-        await pm.productsPage.goToCartPopUpMessage()
-
-        await pm.cartPage.verifyCartHeading()
-
-        await pm.cartPage.clickCheckOutBtn()
-
-        await pm.cartPage.verifyAddressDetailsHeading()
-        await pm.cartPage.verifyReviewOrderHeading()
-
-        await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
-
-
-        await test.step('Proceed with a payment', async() => {
-
+        await test.step('Adding products to the cart', async() => {
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.goToCartPopUpMessage()
+        })
+        await test.step('View Cart and start checkout', async() => {
+            await pm.cartPage.verifyCartHeading()
+            await pm.cartPage.clickCheckOutBtn()
+        })
+        await test.step('View Address and Review Order Details', async() => {
+            await pm.cartPage.verifyAddressDetailsHeading()
+            await pm.cartPage.verifyReviewOrderHeading()
+        })
+        await test.step('Write a comment and place order', async() => {
+            await pm.cartPage.writeCommentBox('Hello! Please put it in a gift bag')
+        })
+        await test.step('Enter payment details and confirm', async() => {
           await pm.payment.enterPaymentDetails(
                    payCart.cardName,
                    payCart.cardNumber,
@@ -253,43 +218,43 @@ test.describe("Orders Tests", () => {
                    payCart.expMonth,
                    payCart.expYear
            )
-
                await pm.payment.clickPayAndConfirm()
                await pm.payment.verifyPaymentSuccess()
         })
-
-        await pm.deleteUser.deleteUser()
-
+        await test.step('Delete the registered user', async() => {
+            await pm.deleteUser.deleteUser()
         })
+    })
 
+    test("Remove Products from Cart", async({page}) => {
+        let product1;
+        let product2;
 
-    test("17 Remove Products from Cart", async({page}) => {
-
-            const product1 = await pm.productsPage.addRandomProduct()
+        await test.step('Adding products to the cart', async() => {
+            product1 = await pm.addRandomProduct.addRandomProduct()
             await pm.productsPage.continueShoppingPopUpMessage()
-
-            const product2 = await pm.productsPage.addRandomProduct()
+            product2 = await pm.addRandomProduct.addRandomProduct()
             await pm.productsPage.goToCartPopUpMessage()
-
+        })
+        await test.step('View Cart page is displayed', async() => {
             await pm.cartPage.verifyCartHeading()
-
-            await pm.productsPage.verifyProductsInCart(product1.productName)
-            await pm.productsPage.verifyProductsInCart(product2.productName)
-
+        })
+        await test.step('Verify both products are in the cart', async() => {
+            await pm.cartPage.verifyProductsInCart(product1.productName)
+            await pm.cartPage.verifyProductsInCart(product2.productName)
+        })
+        await test.step('Remove both products from the cart', async() => {
             await pm.cartPage.deleteProductFromCart(product1.productName)
             await pm.cartPage.deleteProductFromCart(product2.productName)
+        })
+    })
 
-            })
-
-    test("23 Verify address details in checkout page", async({page}) => {
-
-          await pm.menuBar.navigateToSignupLogin()
-          await expect(page.getByText('New User Signup!')).toBeVisible();
-
-          await pm.signupPage.signup(validUser.name, validUser.email)
-
-          await pm.registerUser.registration (page, {
-
+    test("Verify address details in checkout page", async({page}) => {
+        await test.step("Register a new User", async() => {
+            await pm.menuBar.navigateToSignupLogin()
+            await expect(page.getByText('New User Signup!')).toBeVisible();
+            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.registerUser.registration (page, {
                         password: validUser.password,
                         day: registeredUser.birthDate,
                         month: registeredUser.birthMonth,
@@ -304,50 +269,47 @@ test.describe("Orders Tests", () => {
                         city: registeredUser.city,
                         zipcode: registeredUser.zipcode,
                         mobilenumber: registeredUser.mobileNumber,
-
                     });
+            await page.getByRole('link', {name: 'Continue'}).click()
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
+        await test.step('Adding products to the cart', async() => {
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.continueShoppingPopUpMessage()
 
-          await page.getByRole('link', {name: 'Continue'}).click()
-
-          await expect(page.getByText(validUser.name)).toBeVisible()
-
-                await pm.productsPage.addRandomProduct()
-                await pm.productsPage.continueShoppingPopUpMessage()
-
-                await pm.productsPage.addRandomProduct()
-                await pm.productsPage.goToCartPopUpMessage()
-
-                await pm.cartPage.verifyCartHeading()
-
-                await pm.cartPage.clickCheckOutBtn()
-
-                await pm.cartPage.verifyDeliveryAddress(registeredUser)
-
-                await pm.cartPage.verifyBillingAddress(registeredUser)
-
-                await pm.deleteUser.deleteUser()
-
-            })
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.goToCartPopUpMessage()
+        })
+        await test.step('View Cart and start checkout', async() => {
+            await pm.cartPage.verifyCartHeading()
+            await pm.cartPage.clickCheckOutBtn()
+        })
+        await test.step('Verify Delivery and Billing address corresponds to registered user', async() => {
+            await pm.cartPage.verifyDeliveryAddress(registeredUser)
+            await pm.cartPage.verifyBillingAddress(registeredUser)
+        })
+        await test.step('Delete the registered user', async() => {
+            await pm.deleteUser.deleteUser()
+        })
+    })
 
 
-    test.only("24 Download Invoice after purchase order", async ({page}) => {
+    test.only("Download Invoice after purchase order", async ({page}) => {
+        await test.step('Adding products to the cart', async() => {
+            const product = await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.continueShoppingPopUpMessage()
 
-                const product = await pm.productsPage.addRandomProduct()
-                await pm.productsPage.continueShoppingPopUpMessage()
-
-                await pm.productsPage.addRandomProduct()
-                await pm.productsPage.goToCartPopUpMessage()
-
-                await pm.cartPage.verifyCartHeading()
-
-                await pm.cartPage.clickCheckOutBtn()
-
-                await pm.cartPage.clickRegisterPopupCheckout()
-
-                await pm.signupPage.signup(validUser.name, validUser.email)
-
-                await pm.registerUser.registration (page, {
-
+            await pm.addRandomProduct.addRandomProduct()
+            await pm.productsPage.goToCartPopUpMessage()
+        })
+        await test.step('View Cart and start checkout before login/registration', async() => {
+            await pm.cartPage.verifyCartHeading()
+            await pm.cartPage.clickCheckOutBtn()
+        })
+        await test.step("Register a new User", async() => {
+            await pm.cartPage.clickRegisterPopupCheckout()
+            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.registerUser.registration (page, {
                      password: validUser.password,
                      day: registeredUser.birthDate,
                      month: registeredUser.birthMonth,
@@ -362,37 +324,39 @@ test.describe("Orders Tests", () => {
                      city: registeredUser.city,
                      zipcode: registeredUser.zipcode,
                      mobilenumber: registeredUser.mobileNumber,
-                    });
-
-                await page.getByRole('link', {name: 'Continue'}).click()
-                await expect(page.getByText(validUser.name)).toBeVisible()
-
-                await pm.menuBar.navigateToCart()
-                await pm.cartPage.clickCheckOutBtn()
-
-                await pm.cartPage.verifyDeliveryAddress(registeredUser)
-
-                await pm.cartPage.verifyBillingAddress(registeredUser)
-
-                await pm.cartPage.writeCommentBox('Please, handle with care. Fragile item.')
-
-                await pm.payment.enterPaymentDetails (
-                    payCart.cardName,
-                    payCart.cardNumber,
-                    payCart.cvc,
-                    payCart.expMonth,
-                    payCart.expYear
-                );
-
-                await pm.payment.clickPayAndConfirm()
-                await pm.payment.verifyPaymentSuccess()
-
-                await pm.payment.downloadInvoice()
-
-                await page.getByRole('link', {name: 'Continue'}).click()
-
-                await pm.deleteUser.deleteUser()
-
-                })
+            });
+            await page.getByRole('link', {name: 'Continue'}).click()
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
+        await test.step('View Cart and start checkout', async() => {
+            await pm.menuBar.navigateToCart()
+            await pm.cartPage.clickCheckOutBtn()
+        })
+        await test.step('Verify Delivery and Billing address corresponds to registered user', async() => {
+            await pm.cartPage.verifyDeliveryAddress(registeredUser)
+            await pm.cartPage.verifyBillingAddress(registeredUser)
+        })
+        await test.step('Write a comment and place order', async() => {
+            await pm.cartPage.writeCommentBox('Please, handle with care. Fragile item')
+        })
+        await test.step('Enter payment details and confirm', async() => {
+            await pm.payment.enterPaymentDetails(
+                           payCart.cardName,
+                           payCart.cardNumber,
+                           payCart.cvc,
+                           payCart.expMonth,
+                           payCart.expYear
+                   )
+            await pm.payment.clickPayAndConfirm()
+            await pm.payment.verifyPaymentSuccess()
+            })
+        await test.step('Download invoice', async() => {
+            await pm.payment.downloadInvoice()
+            await page.getByRole('link', {name: 'Continue'}).click()
+        })
+        await test.step('Delete the registered user', async() => {
+            await pm.deleteUser.deleteUser()
+        })
+    })
 
 })

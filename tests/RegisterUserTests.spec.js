@@ -14,58 +14,65 @@ test.beforeEach(async ({page}) =>{
         console.log(await popup.title())
     })
 
-    await page.getByText('This site asks for consent to use your data').click();
-    await page.getByRole('button', {name: 'Consent'}).click();
-
     pm = new PomManager(page)
+
+    await pm.basePage.acceptConsent()
 })
 
 test.describe('Register User Tests', () => {
 
-    test(" 1 Register User", async ({page}) => {
+    test("Register User", async ({page}) => {
+        await test.step("Navigate to SignUp/Login page", async() => {
+            await pm.menuBar.navigateToSignupLogin()
+            await expect(page.getByText('New User Signup!')).toBeVisible();
+        })
 
-    await page.getByRole('link', {name:'Signup / Login'}).click()
-    await expect(page.getByText('New User Signup!')).toBeVisible();
+        await test.step("Sign up with valid credentials", async() => {
+            await pm.signupPage.signup(validUser.name, validUser.email)
+            await expect(page.getByText('Enter Account Information')).toBeVisible();
+        })
 
-    await pm.signupPage.signup(validUser.name, validUser.email)
+        await test.step("Register a new user with valid credentials", async() => {
+            await pm.registerUser.registration (page, {
+                password: validUser.password,
+                day: registeredUser.birthDate,
+                month: registeredUser.birthMonth,
+                year: registeredUser.birthYear,
+                firstname: registeredUser.firstName,
+                lastname: registeredUser.lastName,
+                company: registeredUser.company,
+                address: registeredUser.address,
+                address2: registeredUser.address2,
+                country: registeredUser.country,
+                state: registeredUser.state,
+                city: registeredUser.city,
+                zipcode: registeredUser.zipcode,
+                mobilenumber: registeredUser.mobileNumber
+            });
+        })
+            await page.getByRole('link', {name: 'Continue'}).click()
 
-    await expect(page.getByText('Enter Account Information')).toBeVisible();
+        await test.step("Verify user is logged in", async() => {
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
 
-    await pm.registerUser.registration (page, {
-
-        password: validUser.password,
-        day: registeredUser.birthDate,
-        month: registeredUser.birthMonth,
-        year: registeredUser.birthYear,
-        firstname: registeredUser.firstName,
-        lastname: registeredUser.lastName,
-        company: registeredUser.company,
-        address: registeredUser.address,
-        address2: registeredUser.address2,
-        country: registeredUser.country,
-        state: registeredUser.state,
-        city: registeredUser.city,
-        zipcode: registeredUser.zipcode,
-        mobilenumber: registeredUser.mobileNumber,
-
-    });
-
-    await page.getByRole('link', {name: 'Continue'}).click()
-
-    await expect(page.getByText(validUser.name)).toBeVisible()
-
-//    await deleteUser(page)
-})
-
-    test(" 5 Register User with existing email", async ({page}) => {
-
-    await page.getByRole('link', {name:'Signup / Login'}).click()
-    await expect(page.getByText('New User Signup!')).toBeVisible();
-
-    await pm.signupPage.signup(validUser.name, validUser.email)
-
-    await pm.signupPage.expectSignupError();
-
+//        await test.step("Delete user", async() => {
+//            await pm.deleteUser.deleteUser()
+//        })
     })
 
+    test("Register User with existing email", async ({page}) => {
+        await test.step("Navigate to SignUp/Login page", async() => {
+            await pm.menuBar.navigateToSignupLogin()
+            await expect(page.getByText('New User Signup!')).toBeVisible();
+        })
+
+        await test.step("Verify user is logged in", async() => {
+            await pm.signupPage.signup(validUser.name, validUser.email)
+        })
+
+        await test.step("Verify expected login error", async() => {
+            await pm.signupPage.expectSignupError();
+        })
+    })
 })

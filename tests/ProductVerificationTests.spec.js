@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise";
-import { validUser, searchProducts, categories, brands } from "../data/variables.js";
+import { validUser, searchProducts, categories, brands, products } from "../data/variables.js";
 
 let pm;
 
@@ -14,138 +14,137 @@ test.beforeEach(async ({page}) =>{
         console.log(await popup.title())
     })
 
-    await page.getByText('This site asks for consent to use your data').click();
-    await page.getByRole('button', {name: 'Consent'}).click();
-
     pm = new PomManager(page)
+
+    await pm.basePage.acceptConsent()
 })
 
     test.describe('Products Tests', () => {
 
-    test("8 Verify All Products and product detail page", async ({page}) => {
-
+    test("Verify All Products and product detail page", async ({page}) => {
         await test.step('Navigate to Products page', async () => {
             await pm.menuBar.navigateToProducts()
             await pm.productsPage.verifyAllProductsHeading()
         });
-
         await test.step('Open first product details page', async () => {
-            await page.locator('a[href="/product_details/1"]').click()
+            await pm.productsPage.viewProductById(1)
         });
-
-        await test.step('Verify product detail information', async () => {
-
-            await expect(page.locator('div.product-information')).toBeVisible()
-
-            const productInfo = page.locator('div.product-information')
-
-            await expect(productInfo.locator('h2')).toBeVisible()
-            await expect(productInfo.locator('p:has-text("Category")')).toBeVisible()
-            await expect(productInfo.locator('span span:has-text("Rs.")')).toBeVisible()
-            await expect(productInfo.locator('p b:has-text("Availability")')).toBeVisible()
-            await expect(productInfo.locator('p b:has-text("Condition")')).toBeVisible()
-            await expect(productInfo.locator('p b:has-text("Brand")')).toBeVisible()
-
-        });
-
-    })
-
-    test("9 Search Product", async ({page}) => {
-
-        await test.step('Navigate to Products page', async () => {
-            pm.menuBar.navigateToProducts()
-            pm.productsPage.verifyAllProductsHeading()
-        });
-
-        await test.step('Search Product', async () => {
-
-            await pm.productsPage.searchForProduct(searchProducts.existingProduct)
-            await pm.productsPage.verifySearchResultsHeading()
-
-            await pm.productsPage.verifyRelatedSearchResults(searchProducts.existingProduct)
+        await test.step('Verify product detail information corresponds th chosen product', async () => {
+            await pm.productDetails.verifyProdInfoDetails(products.product1.id,
+                {
+                  name: products.product1.name,
+                  category: products.product1.category,
+                  price: products.product1.price,
+                  quantity: products.product1.quantity,
+                  availability: products.product1.availability,
+                  condition: products.product1.condition,
+                  brand: products.product1.brand
+                })
             })
+        });
+
+    test("Search Product", async ({page}) => {
+        await test.step('Navigate to Products page', async () => {
+            await pm.menuBar.navigateToProducts()
+            await pm.productsPage.verifyAllProductsHeading()
+        });
+        await test.step('Search product by name', async () => {
+            await pm.search.searchForProduct(searchProducts.existingProduct)
+        })
+        await test.step('Verify related search results', async () => {
+            await pm.search.verifySearchResultsHeading()
+            await pm.search.verifyRelatedSearchResults(searchProducts.existingProduct)
+        })
     })
 
-    test("18 View Category Products", async({page}) => {
-
+    test("View Category Products", async({page}) => {
+        await test.step('Verify category title is displayed', async () => {
            await pm.productsCategory.verifyCategoryTitle()
-
-           await test.step('Verify that category page is displayed after click', async () => {
-
-           pm.productsCategory.openCategory(categories[0].main)
-           pm.productsCategory.openSubCategory(categories[0].sub[0])
-           await page.waitForTimeout(1000)
-
-           await pm.productsCategory.verifyCategoryHeading(categories[0].main, categories[0].sub[0])
-           })
-
-           await test.step('Verify that user is navigated to another category page', async () => {
-
-           pm.productsCategory.openCategory(categories[1].main)
-           pm.productsCategory.openSubCategory(categories[1].sub[0])
-           await page.waitForTimeout(1000)
-
+        })
+        await test.step('Verify category page is displayed after click', async () => {
+            await pm.productsCategory.openCategory(categories[0].main)
+            await pm.productsCategory.openSubCategory(categories[0].main, categories[0].sub[0])
+            await pm.productsCategory.verifyCategoryHeading(categories[0].main, categories[0].sub[0])
+        })
+        await test.step('Verify that user is navigated to another category page', async () => {
+           await pm.productsCategory.openCategory(categories[1].main)
+           await pm.productsCategory.openSubCategory(categories[1].main, categories[1].sub[0])
            await pm.productsCategory.verifyCategoryHeading(categories[1].main, categories[1].sub[0])
-           })
+        })
     })
 
-    test("19 View & Cart Brand Products", async({page}) => {
-
-        pm.menuBar.navigateToProducts()
-
-        await pm.productsBrands.verifyBrandsTitle()
-
-        pm.productsBrands.chooseBrand(brands[1])
-        await pm.productsBrands.verifyBrandHeading(brands[1])
-
-        pm.productsBrands.chooseBrand(brands[2])
-        await pm.productsBrands.verifyBrandHeading(brands[2])
-
+    test("View & Cart Brand Products", async({page}) => {
+        await test.step('Navigate to Products page', async () => {
+            await pm.menuBar.navigateToProducts()
+        })
+        await test.step('Verify brand title is displayed', async () => {
+            await pm.productsBrands.verifyBrandsTitle()
+        })
+        await test.step('Verify brand page is displayed after click', async () => {
+            await pm.productsBrands.chooseBrand(brands[1])
+            await pm.productsBrands.verifyBrandHeading(brands[1])
+        })
+        await test.step('Verify that user is navigated to another brand page', async () => {
+            await pm.productsBrands.chooseBrand(brands[2])
+            await pm.productsBrands.verifyBrandHeading(brands[2])
+        })
     })
 
-    test("20 Search Products and Verify Cart after Login", async({page}) => {
-
-       await pm.menuBar.navigateToProducts()
-
-       await pm.productsPage.verifyAllProductsHeading()
-       await pm.productsPage.searchForProduct(searchProducts.existingProduct)
-       await pm.productsPage.verifySearchResultsHeading()
-
-       await pm.productsPage.addSearchedProductsToCart()
-
-       await pm.productsPage.goToCart()
-       await pm.productsPage.verifyProductsInCart(searchProducts.searchedProduct)
-
-       await pm.menuBar.navigateToSignupLogin()
-       await pm.loginPage.login(validUser.email, validUser.password)
-
-       await pm.productsPage.goToCart()
-       await pm.productsPage.verifyProductsInCart(searchProducts.searchedProduct)
-
+    test("Search Products and Verify Cart after Login", async({page}) => {
+       await test.step('Navigate to Products page', async () => {
+            await pm.menuBar.navigateToProducts()
+            await pm.productsPage.verifyAllProductsHeading()
        })
+       await test.step('Search product by name', async () => {
+            await pm.search.searchForProduct(searchProducts.existingProduct)
+       })
+       await test.step('Verify related search results', async () => {
+            await pm.search.verifySearchResultsHeading()
+       })
+       await test.step('Add searched products to the cart', async () => {
+            await pm.search.addSearchedProductsToCart()
+       })
+       await test.step('Verify Products are visible in the cart before login', async () => {
+            await pm.menuBar.navigateToCart()
+            await pm.cartPage.verifyProductsInCart(searchProducts.searchedProduct)
+       })
+       await test.step('Login in with valid credentials', async () => {
+            await pm.menuBar.navigateToSignupLogin()
+            await pm.loginPage.login(validUser.email, validUser.password)
+       })
+       await test.step('Verify Products are visible in the cart after login', async () => {
+            await pm.menuBar.navigateToCart()
+            await pm.cartPage.verifyProductsInCart(searchProducts.searchedProduct)
+       })
+    })
 
-    test("21 Add review on product", async({page}) => {
-
+    test("Add review on product", async({page}) => {
+        await test.step('Navigate to Products page', async () => {
            await pm.menuBar.navigateToProducts()
            await pm.productsPage.verifyAllProductsHeading()
-
+        })
+        await test.step('Add random product to the cart', async () => {
            await pm.addRandomProduct.clickRandomViewProduct()
-
+        })
+        await test.step('Write a review and submit', async () => {
            await pm.productDetails.verifyWriteReviewSection()
            await pm.productDetails.writeReview(validUser.name, validUser.email, 'Great product!')
-
            await pm.productDetails.verifyReviewSubmission()
+        })
 
     })
 
-    test("22 Add to cart from Recommended items", async({page}) => {
-
+    test("Add to cart from Recommended items", async({page}) => {
+        await test.step('Verify recommended item section is visible', async () => {
           await pm.recommendedItems.verifyRecommendedItemsSection()
-
+        })
+        await test.step('Add random product from recommended item section to the cart', async () => {
           await pm.recommendedItems.addRandomRecommendedItemToCart()
-          await pm.productsPage.goToCartFromPopUpMessage()
-
+        })
+        await test.step('Verify chosen products are visible in the cart', async () => {
+          await pm.productsPage.goToCartPopUpMessage()
           await pm.recommendedItems.VerifyProductInCart()
+        })
     })
 
 })

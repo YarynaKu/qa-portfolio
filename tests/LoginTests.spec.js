@@ -14,52 +14,53 @@ test.beforeEach(async ({page}) => {
         console.log(await popup.title())
     })
 
-    await page.getByText('This site asks for consent to use your data').click();
-    await page.getByRole('button', {name: 'Consent'}).click();
-
     pm = new PomManager(page)
+
+    await pm.basePage.acceptConsent()
+
+    await pm.menuBar.navigateToSignupLogin()
+    await pm.loginPage.expectLoginPageVisible();
 })
 
-    test.afterEach(async ({page}) => {
-        await page.close()
-    })
 
 test.describe('Login Tests', () => {
 
-    test(" 2 Login User with correct email and password", async ({page}) => {
+    test("Login User with correct email and password", async ({page}) => {
+        await test.step("Login with valid credentials", async() => {
+            await pm.loginPage.login(validUser.email, validUser.password)
+        })
 
-    await page.getByRole('link', {name:'Signup / Login'}).click()
-    await pm.loginPage.expectSuccessfulLogin();
+        await test.step("Verify user is logged in", async() => {
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
 
-    await pm.loginPage.login(validUser.email, validUser.password)
-    await expect(page.getByText(validUser.name)).toBeVisible()
-
-//    await page.getByRole('link', {name: 'Delete Account'}).click()
-//    await expect(page.getByText('Account Deleted!')).toBeVisible()
-    // await page.pause()
-})
-
-    test("3 Login User with incorrect email and password", async ({page}) => {
-
-    await page.getByRole('link', {name:'Signup / Login'}).click()
-    await pm.loginPage.expectSuccessfulLogin();
-
-    await pm.loginPage.login(invalidUser.email, invalidUser.password)
-    await pm.loginPage.expectLoginError()
-
+        await test.step("Delete user", async() => {
+            await pm.deleteUser.deleteUser()
+        })
     })
 
-    test("4 Logout User", async ({page}) => {
+    test("Login User with incorrect email and password", async ({page}) => {
+        await test.step("Login with invalid credentials", async() => {
+            await pm.loginPage.login(invalidUser.email, invalidUser.password)
+        })
 
-        await page.getByRole('link', {name:'Signup / Login'}).click()
-        await pm.loginPage.expectSuccessfulLogin();
-
-        await pm.loginPage.login(validUser.email, validUser.password)
-        await expect(page.getByText(validUser.name)).toBeVisible()
-
-        await page.getByRole('link', {name: 'Logout'}).click()
-        await pm.loginPage.expectSuccessfulLogin();
-
+        await test.step("Verify expected login error", async() => {
+            await pm.loginPage.expectLoginError()
+        })
     })
 
+    test("Logout User", async ({page}) => {
+        await test.step("Login with valid credentials", async() => {
+            await pm.loginPage.login(validUser.email, validUser.password)
+        })
+
+        await test.step("Verify user is logged in", async() => {
+            await expect(page.getByText(validUser.name)).toBeVisible()
+        })
+
+        await test.step("Verify successful user logout", async() => {
+            await pm.menuBar.navigateToLogout()
+            await pm.loginPage.expectLoginPageVisible();
+        })
+    })
 })
