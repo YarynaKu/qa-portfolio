@@ -12,6 +12,10 @@ import RecommendedItems from "./RecommendedItems.js";
 import CartPage from "./CartPage.js";
 import Payment from "./Payment.js";
 import DeleteUser from "./DeleteUser.js"
+import BasePage from "./BasePage.js"
+import ContactUsPage from "./ContactUsPage.js"
+import TestCasesPage from "./TestCases.js"
+import SearchPage from "./SearchPage.js"
 
 export default class PomManager {
 
@@ -22,7 +26,7 @@ export default class PomManager {
         this.registerUser = new RegisterUser(page)
         this.menuBar = new MenuBar(page)
         this.subscriptionFooter = new SubscriptionFooter(page)
-//        this.homePage = new HomePage(page)
+        this.basePage = new BasePage(page)
         this.productsPage = new ProductsPage(page)
         this.productsCategory = new ProductsCategory(page)
         this.productsBrands = new ProductsBrands(page)
@@ -32,6 +36,8 @@ export default class PomManager {
         this.cartPage = new CartPage(page)
         this.payment = new Payment(page)
         this.deleteUser = new DeleteUser(page)
-//        this.contactUsPage = new ContactUsPage(page)
+        this.contactUs = new ContactUsPage(page)
+        this.testCases = new TestCasesPage(page)
+        this.search = new SearchPage(page)
     }
 }
