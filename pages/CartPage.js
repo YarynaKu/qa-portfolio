@@ -1,27 +1,35 @@
 import { expect } from "@playwright/test";
-import CommonActions from "../utils/CommonActions.js";
 import { expectedAddressFields } from "../data/variables.js"
 import { normalizeText } from "../utils/utils.js"
 
 export default class CartPage {
-        constructor(page){
-        this.actions = new CommonActions(page)
-        this.page = page
 
-        this.cartHeading = 'li[class="active"]'
-        this.checkOutBtn = 'a[class="btn btn-default check_out"]'
+        constructor(page){
+        this.page = page;
+
+        this.cartHeading = page.locator('li[class="active"]')
+        this.checkOutBtn = page.locator('a[class="btn btn-default check_out"]')
         this.addressDetailsHeading = page.getByRole('heading', {name: 'Address Details'})
         this.reviewOrderHeading = page.getByRole('heading', {name: 'Review Your Order'})
-        this.commentBoxLocator = 'textarea[class="form-control"]'
-
+        this.commentBoxLocator = page.locator('textarea[class="form-control"]')
     }
 
     async verifyCartHeading() {
-        await expect(this.page.locator(this.cartHeading)).toHaveText('Shopping Cart')
+        await expect(this.cartHeading).toHaveText('Shopping Cart')
     }
 
+    async verifyProductsInCart(productName) {
+            await expect(this.page.locator('#cart_info_table')).toBeVisible();
+            const itemRows = this.page.locator('#cart_info_table tr').filter({ hasText: productName })
+            const count = await itemRows.count()
+
+            for (let i = 0; i < count; i++) {
+                await expect(itemRows.nth(i)).toBeVisible();
+            }
+        }
+
     async clickCheckOutBtn(){
-        await this.actions.click(this.checkOutBtn)
+        await this.checkOutBtn.click()
     }
 
     async clickRegisterPopupCheckout(){
@@ -37,7 +45,7 @@ export default class CartPage {
     }
 
     async writeCommentBox(review){
-        await this.actions.fill(this.commentBoxLocator, review)
+        await this.commentBoxLocator.fill(review)
         await this.page.getByRole('link', {name: 'Place Order'}).click()
     }
 
