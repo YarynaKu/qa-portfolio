@@ -1,9 +1,7 @@
 import { expect } from '@playwright/test';
-import CommonActions from '../utils/CommonActions.js';
 
 export default class RecommendedItems {
     constructor(page) {
-        this.commonActions = new CommonActions(page);
         this.page = page;
 
         this.recommendedItemsSection = page.getByRole('heading', {name: 'Recommended items'})

@@ -1,13 +1,11 @@
 import { expect } from "@playwright/test";
-import CommonActions from "../utils/CommonActions.js";
-
 
 export default class MenuBar {
 
     constructor(page) {
-        this.actions = new CommonActions(page)
+        this.page = page;
 
- //       this.homeLink = page.getByRole('listitem').filter({hasText: 'Home'})
+        this.homeLink = page.getByRole('listitem').filter({hasText: 'Home'})
         this.productsLink = page.getByRole('link', {name: 'Products'})
         this.cartLink = page.getByRole('link', {name: 'Cart'})
         this.contactUsLink = page.getByRole('link', {name: 'Contact us'})
@@ -17,31 +15,31 @@ export default class MenuBar {
     }
 
     async navigateToHome(){
-        await this.actions.click(this.homeLink)
+        await this.homeLink.click()
     }
 
     async navigateToProducts(){
-        await this.actions.click2(this.productsLink)
+        await this.productsLink.click()
     }
 
     async navigateToCart(){
-        await this.actions.click2(this.cartLink)
+        await this.cartLink.click()
     }
 
     async navigateToContactUs(){
-        await this.actions.click2(this.contactUsLink)
+        await this.contactUsLink.click()
     }
 
     async navigateToSignupLogin(){
-        await this.actions.click2(this.signupLoginLink)
+        await this.signupLoginLink.click()
     }
 
     async navigateToLogout(){
-        await this.actions.click(this.logoutLink)
+        await this.logoutLink.click()
     }
 
     async navigateToTestCases(){
-        await this.actions.click2(this.testCasesLink)
+        await this.testCasesLink.click()
     }
 
 

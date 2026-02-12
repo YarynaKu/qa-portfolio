@@ -1,10 +1,8 @@
 import { expect } from "@playwright/test";
-import CommonActions from "../utils/CommonActions.js";
 
 export default class ProductsBrands {
     constructor(page) {
-        this.actions = new CommonActions(page)
-        this.page = page
+        this.page = page;
 
         this.brandTitle = page.getByRole('heading', {name: "Brands"})
 
@@ -15,11 +13,11 @@ export default class ProductsBrands {
     }
 
     brandSelector(brandName) {
-        return `a:has-text("${brandName}")`;;
+        return this.page.locator(`a:has-text("${brandName}")`);;
     }
 
     async chooseBrand(brandName){
-        await this.actions.click(this.brandSelector(brandName))
+        await this.brandSelector(brandName).click()
     }
 
     displayedBrandHeading(brandName) {

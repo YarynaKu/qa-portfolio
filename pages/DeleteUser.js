@@ -1,12 +1,9 @@
 import { expect } from "@playwright/test";
-import CommonActions from "../utils/CommonActions.js";
 
 export default class DeleteUser{
     constructor(page){
-        this.actions = new CommonActions(page)
-        this.page = page
 
-
+        this.page = page;
     }
 
     async deleteUser(){
