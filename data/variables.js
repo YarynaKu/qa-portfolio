@@ -44,7 +44,8 @@ export let searchProducts = {
 
 export const products = {
     product1: {
-        id: 1, name: 'Blue Top', category: 'Women > Tops', price: 'Rs. 500', quantity: '1', total: 'Rs. 500'
+        id: 1, name: 'Blue Top', category: 'Women > Tops', price: 'Rs. 500', quantity: '1', total: 'Rs. 500',
+        availability: ' In Stock', condition: ' New', brand: 'Polo'
     },
     product2: {
         id:2, name: 'Men Tshirt', category: 'Men > Tshirts', price: 'Rs. 400', quantity: '1', total: 'Rs. 400'
