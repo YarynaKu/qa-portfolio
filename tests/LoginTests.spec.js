@@ -34,9 +34,9 @@ test.describe('Login Tests', () => {
             await expect(page.getByText(validUser.name)).toBeVisible()
         })
 
-        await test.step("Delete user", async() => {
-            await pm.deleteUser.deleteUser()
-        })
+//        await test.step("Delete user", async() => {
+//            await pm.deleteUser.deleteUser()
+//        })
     })
 
     test("Login User with incorrect email and password", async ({page}) => {
