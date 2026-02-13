@@ -14,7 +14,7 @@ export default class ProductDetails {
         }
 
     async verifyWriteReviewSection() {
-        await expect(this.page.locator(this.writeReviewSelector)).toBeVisible();
+        await expect(this.writeReviewSelector).toBeVisible();
     }
 
     async writeReview(name, email, review) {
