@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test"
 import PomManager from "../pages/POM_practise";
 import { Payment } from "../pages/Payment";
 import { deleteUser } from "../pages/DeleteUser";
-import { products, validUser, registeredUser, payCart, expectedAddressFields } from "../data/variables";
+import { products, validUser, validNewUser, registeredUser, payCart, expectedAddressFields } from "../data/variables";
 
 let pm;
 
@@ -79,7 +79,7 @@ test.describe("Orders Tests", () => {
     test("Place Order: Register while Checkout", async ({page}) => {
         await test.step('Adding random products to the cart', async() => {
             await pm.addRandomProduct.addRandomProduct()
-            await pm.addRandomProduct.continueShoppingPopUpMessage()
+            await pm.productsPage.continueShoppingPopUpMessage()
             await pm.addRandomProduct.addRandomProduct()
         })
         await test.step('View Cart and start checkout', async() => {
@@ -89,9 +89,9 @@ test.describe("Orders Tests", () => {
             await pm.cartPage.clickRegisterPopupCheckout()
         })
         await test.step('Register a new User', async() => {
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
                 await pm.registerUser.registration (page, {
-                    password: validUser.password,
+                    password: validNewUser.password,
                     day: registeredUser.birthDate,
                     month: registeredUser.birthMonth,
                     year: registeredUser.birthYear,
@@ -109,7 +109,7 @@ test.describe("Orders Tests", () => {
             await page.getByRole('link', {name: 'Continue'}).click()
         })
         await test.step('Place Order with a comment', async() => {
-            await expect(page.getByText(validUser.name)).toBeVisible()
+            await expect(page.getByText(validNewUser.name)).toBeVisible()
             await pm.menuBar.navigateToCart()
             await pm.cartPage.clickCheckOutBtn()
             await pm.cartPage.verifyAddressDetailsHeading()
@@ -135,10 +135,10 @@ test.describe("Orders Tests", () => {
     test("Place Order: Register before Checkout", async({page}) => {
         await test.step('Register a new User', async() => {
             await pm.menuBar.navigateToSignupLogin()
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
                     await pm.registerUser.registration (page, {
 
-                        password: validUser.password,
+                        password: validNewUser.password,
                         day: registeredUser.birthDate,
                         month: registeredUser.birthMonth,
                         year: registeredUser.birthYear,
@@ -155,7 +155,7 @@ test.describe("Orders Tests", () => {
 
                     });
             await page.getByRole('link', {name: 'Continue'}).click()
-            await expect(page.getByText(validUser.name)).toBeVisible()
+            await expect(page.getByText(validNewUser.name)).toBeVisible()
         })
         await test.step('Adding random products to the cart', async() => {
             await pm.addRandomProduct.addRandomProduct()
@@ -253,9 +253,9 @@ test.describe("Orders Tests", () => {
         await test.step("Register a new User", async() => {
             await pm.menuBar.navigateToSignupLogin()
             await expect(page.getByText('New User Signup!')).toBeVisible();
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
             await pm.registerUser.registration (page, {
-                        password: validUser.password,
+                        password: validNewUser.password,
                         day: registeredUser.birthDate,
                         month: registeredUser.birthMonth,
                         year: registeredUser.birthYear,
@@ -271,7 +271,7 @@ test.describe("Orders Tests", () => {
                         mobilenumber: registeredUser.mobileNumber,
                     });
             await page.getByRole('link', {name: 'Continue'}).click()
-            await expect(page.getByText(validUser.name)).toBeVisible()
+            await expect(page.getByText(validNewUser.name)).toBeVisible()
         })
         await test.step('Adding products to the cart', async() => {
             await pm.addRandomProduct.addRandomProduct()
@@ -294,7 +294,7 @@ test.describe("Orders Tests", () => {
     })
 
 
-    test.only("Download Invoice after purchase order", async ({page}) => {
+    test("Download Invoice after purchase order", async ({page}) => {
         await test.step('Adding products to the cart', async() => {
             const product = await pm.addRandomProduct.addRandomProduct()
             await pm.productsPage.continueShoppingPopUpMessage()
@@ -308,9 +308,9 @@ test.describe("Orders Tests", () => {
         })
         await test.step("Register a new User", async() => {
             await pm.cartPage.clickRegisterPopupCheckout()
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
             await pm.registerUser.registration (page, {
-                     password: validUser.password,
+                     password: validNewUser.password,
                      day: registeredUser.birthDate,
                      month: registeredUser.birthMonth,
                      year: registeredUser.birthYear,
@@ -326,7 +326,7 @@ test.describe("Orders Tests", () => {
                      mobilenumber: registeredUser.mobileNumber,
             });
             await page.getByRole('link', {name: 'Continue'}).click()
-            await expect(page.getByText(validUser.name)).toBeVisible()
+            await expect(page.getByText(validNewUser.name)).toBeVisible()
         })
         await test.step('View Cart and start checkout', async() => {
             await pm.menuBar.navigateToCart()
