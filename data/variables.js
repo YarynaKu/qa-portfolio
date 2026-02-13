@@ -6,6 +6,12 @@ export const validUser = {
     email: 'testya@gmail.com'
 };
 
+export const validNewUser = {
+    name: 'YaTUser',
+    password: 'YaTPassword!',
+    email: 'testyat@gmail.com'
+};
+
 export const invalidUser = {
     email: 'testyaya@gmail.com',
     password: 'YayaTestPassword!'
