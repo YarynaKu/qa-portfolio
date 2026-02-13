@@ -23,34 +23,6 @@ test.beforeEach(async ({page}) =>{
 
 test.describe("Contact Us and Subscription Tests", () => {
 
-    test("Contact Us Form", async ({page}) => {
-        await test.step('Navigate to ContactUs Page', async () => {
-            await pm.menuBar.navigateToContactUs()
-            await expect(page.getByText('Get In Touch')).toBeVisible()
-        })
-        await test.step('Fill in details', async () => {
-            await pm.contactUs.fillForm(
-                validUser.name,
-                validUser.email,
-                "Testing Contact Us Form",
-                "I am testing Contact Us Form"
-            )});
-        await test.step('Upload file', async () => {
-            const filePath = path.resolve("data/testContactUs.doc");
-            await pm.contactUs.uploadFile(filePath)
-
-            page.once("dialog", dialog => dialog.accept())
-        })
-        await test.step('Submit information', async () => {
-            await pm.contactUs.submit()
-            await pm.contactUs.expectSuccessMessage()
-        })
-        await test.step('Return to Home page', async () => {
-            await pm.menuBar.navigateToHome()
-            await expect(page.getByAltText('Website for automation practice')).toBeVisible()
-        })
-    })
-
     test("Verify Test Cases Page", async ({page}) => {
         await test.step('Verify Test Cases  are visible on Test Case Page', async () => {
             await pm.menuBar.navigateToTestCases()
@@ -114,6 +86,36 @@ test.describe("Contact Us and Subscription Tests", () => {
             await pm.subscriptionFooter.verifySuccessTopText()
         })
     })
+
+    test("Contact Us Form", async ({page}) => {
+        await test.step('Navigate to ContactUs Page', async () => {
+              await pm.menuBar.navigateToContactUs()
+              await expect(page.getByText('Get In Touch')).toBeVisible()
+        })
+        await test.step('Fill in details', async () => {
+              await pm.contactUs.fillForm(
+                        validUser.name,
+                        validUser.email,
+                        "Testing Contact Us Form",
+                        "I am testing Contact Us Form"
+              )});
+        await test.step('Upload file', async () => {
+              const filePath = path.resolve("data/testContactUs.docx");
+              await pm.contactUs.uploadFile(filePath)
+
+              page.once("dialog", dialog => dialog.accept())
+              })
+        await test.step('Submit information', async () => {
+              await pm.contactUs.submit()
+              await pm.contactUs.expectSuccessMessage()
+              })
+        await test.step('Return to Home page', async () => {
+              await pm.menuBar.navigateToHome()
+              await expect(page.getByAltText('Website for automation practice')).toBeVisible()
+              })
+        })
+
+
 })
 
 
