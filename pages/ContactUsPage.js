@@ -9,9 +9,9 @@ export default class ContactUsPage{
          this.subjectSelector = page.getByRole('textbox', { name: 'Subject'})
          this.messageSelector = page.locator('id=message')
 
-         this.uploadInput = page.locator('input[type="file"]')
-         this.submitBtn = page.getByRole('button', {name: 'Submit'})
-         this.successMessage = page.locator('.status.alert.alert-success:has-text("Success! Your details have been submitted successfully.")')
+         this.uploadInput = page.locator('input[name="upload_file"]')
+         this.submitBtn = page.locator('[data-qa="submit-button"]');
+         this.successMessage = page.locator('.status.alert-success')
 
     }
 
@@ -23,7 +23,9 @@ export default class ContactUsPage{
     }
 
     async uploadFile(filePath){
-         await this.uploadInput.setInputFiles(filePath)
+        await this.uploadInput.setInputFiles(filePath)
+        const filesCount = await this.uploadInput.evaluate(el => el.files.length);
+        if (filesCount === 0) throw new Error("File failed to attach to input");
     }
 
     async submit(){
@@ -35,5 +37,4 @@ export default class ContactUsPage{
         await expect(this.successMessage).toBeVisible()
     }
 
-
-}
+    }
