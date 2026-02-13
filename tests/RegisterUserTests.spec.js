@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import  PomManager  from "../pages/POM_practise";
-import { validUser, registeredUser } from "../data/variables.js";
+import { validUser, validNewUser, registeredUser } from "../data/variables.js";
 
 let pm;
 
@@ -28,13 +28,13 @@ test.describe('Register User Tests', () => {
         })
 
         await test.step("Sign up with valid credentials", async() => {
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
             await expect(page.getByText('Enter Account Information')).toBeVisible();
         })
 
         await test.step("Register a new user with valid credentials", async() => {
             await pm.registerUser.registration (page, {
-                password: validUser.password,
+                password: validNewUser.password,
                 day: registeredUser.birthDate,
                 month: registeredUser.birthMonth,
                 year: registeredUser.birthYear,
@@ -53,7 +53,7 @@ test.describe('Register User Tests', () => {
             await page.getByRole('link', {name: 'Continue'}).click()
 
         await test.step("Verify user is logged in", async() => {
-            await expect(page.getByText(validUser.name)).toBeVisible()
+            await expect(page.getByText(validNewUser.name)).toBeVisible()
         })
 
 //        await test.step("Delete user", async() => {
@@ -68,7 +68,7 @@ test.describe('Register User Tests', () => {
         })
 
         await test.step("Verify user is logged in", async() => {
-            await pm.signupPage.signup(validUser.name, validUser.email)
+            await pm.signupPage.signup(validNewUser.name, validNewUser.email)
         })
 
         await test.step("Verify expected login error", async() => {
