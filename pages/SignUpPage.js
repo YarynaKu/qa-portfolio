@@ -15,7 +15,7 @@ export default class SignupPage {
     async signup(name, email){
         await this.newUserNameSelector.fill(name)
         await this.newUserEmailSelector.fill(email)
-        await this.signupButtonSelector.click()
+        await this.signupButtonSelector.click( { timeout: 10000 })
     }
 
     async expectSignupError(){
