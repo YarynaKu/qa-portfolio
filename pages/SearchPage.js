@@ -45,6 +45,7 @@ export default class AddRandomProduct {
 
                console.log('Number of items found: ', count);
 
+
                for (let i = 0; i < count; i++) {
                  const item = items.nth(i);
                  await expect(item).toBeVisible();
@@ -54,7 +55,7 @@ export default class AddRandomProduct {
                    .scrollIntoViewIfNeeded();
                  await item
                    .locator('.product-overlay .overlay-content a.add-to-cart')
-                   .click();
+                   .evaluate(el => el.click())
 
                  await this.continueShoppingBtn.click();
                }
